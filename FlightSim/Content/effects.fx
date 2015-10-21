@@ -181,7 +181,7 @@ technique Textured
 
 //------- Technique: TexturedNoShading --------
 
-VertexToPixel TexturedNoShadingVS( float4 inPos : SV_Position, float3 inNormal: NORMAL, float2 inTexCoords: TEXCOORD0)
+VertexToPixel TexturedNoShadingVS( float4 inPos : SV_Position0, float2 inTexCoords: TEXCOORD0)
 {	
 	VertexToPixel Output = (VertexToPixel)0;
 	float4x4 preViewProjection = mul (xView, xProjection);
