@@ -23,6 +23,8 @@ namespace FlightSim
         Matrix viewMatrix;
         Matrix projectionMatrix;
 
+        Vector3 lightDirection = new Vector3(3, -2, 5);
+
         int[,] floorPlan;
         int[] buildingHeights = new int[] { 0, 2, 2, 6, 5, 4 };
 
@@ -32,12 +34,18 @@ namespace FlightSim
         Texture2D modelTexture;
         Texture2D texture;
 
+        /*** the xwing variable ***/
         Model xwingModel;
 
         Vector3 xwingPosition = new Vector3(8, 1, -3);
+        float moveSpeed;
+        // Up and down rotational variables
         Quaternion xwingRotation = Quaternion.Identity;
+        float UpDownAcceleration = 0.001f;
+        float curUpDownRot = 0;
+        float desUpDownRot = 0;
 
-        Vector3 lightDirection = new Vector3(3, -2, 5);
+
 
         public Game1()
         {
@@ -55,8 +63,8 @@ namespace FlightSim
         {
             // TODO: Add your initialization logic here
 
-            graphics.PreferredBackBufferWidth = 500;
-            graphics.PreferredBackBufferHeight = 500;
+            graphics.PreferredBackBufferWidth = 800;
+            graphics.PreferredBackBufferHeight = 600;
             graphics.IsFullScreen = false;
             graphics.ApplyChanges();
 
@@ -241,7 +249,6 @@ namespace FlightSim
             UpdateCamera();
             ProcessKeyboard(gameTime);
 
-            float moveSpeed = gameTime.ElapsedGameTime.Milliseconds / 500.0f;
             MoveForward(ref xwingPosition, xwingRotation, moveSpeed);
             // TODO: Add your update logic here
 
@@ -258,13 +265,15 @@ namespace FlightSim
             camup = Vector3.Transform(camup, Matrix.CreateFromQuaternion(xwingRotation));
 
             viewMatrix = Matrix.CreateLookAt(campos, xwingPosition, camup);
-            projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 0.2f, 500.0f);
+            projectionMatrix = Matrix.CreatePerspectiveFieldOfView((float)Math.PI/3, GraphicsDevice.Viewport.AspectRatio, 0.2f, 500.0f);
         }
         private void ProcessKeyboard(GameTime gameTime)
         {
+            moveSpeed = (gameTime.ElapsedGameTime.Milliseconds / 200.0f);
+            float turningSpeed = (float)gameTime.ElapsedGameTime.TotalMilliseconds / 1000.0f;
+
             float leftRightRot = 0;
 
-            float turningSpeed = (float)gameTime.ElapsedGameTime.TotalMilliseconds / 1000.0f;
             turningSpeed *= 1.6f;
             KeyboardState keys = Keyboard.GetState();
             if (keys.IsKeyDown(Keys.Right))
@@ -272,13 +281,41 @@ namespace FlightSim
             if (keys.IsKeyDown(Keys.Left))
                 leftRightRot -= turningSpeed;
 
-            float upDownRot = 0;
-            if (keys.IsKeyDown(Keys.Down))
-                upDownRot += turningSpeed;
-            if (keys.IsKeyDown(Keys.Up))
-                upDownRot -= turningSpeed;
+            if (keys.IsKeyDown(Keys.W)) {
+                moveSpeed *= 1.5f;
+            }
+            if (keys.IsKeyDown(Keys.S)) {
+                moveSpeed *= 0.5f;
+            }
 
-            Quaternion additionalRot = Quaternion.CreateFromAxisAngle(new Vector3(0, 0, -1), leftRightRot) * Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), upDownRot);
+            if (keys.IsKeyDown(Keys.Down))
+                desUpDownRot += turningSpeed;
+            else if (keys.IsKeyDown(Keys.Up))
+                desUpDownRot -= turningSpeed;
+            else
+            {
+                desUpDownRot = 0;
+            }
+
+            if (curUpDownRot < desUpDownRot - UpDownAcceleration)
+            {
+                if (curUpDownRot < turningSpeed)
+                {
+                    curUpDownRot += UpDownAcceleration;
+                }
+            }
+            else if (curUpDownRot > desUpDownRot + UpDownAcceleration)
+            {
+                if (curUpDownRot > -turningSpeed)
+                {
+                    curUpDownRot -= UpDownAcceleration;
+                }
+            }
+            else
+            {
+                curUpDownRot = desUpDownRot;
+            }
+            Quaternion additionalRot = Quaternion.CreateFromAxisAngle(new Vector3(0, 0, -1), leftRightRot) * Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), curUpDownRot);
             xwingRotation *= additionalRot;
         }
 
