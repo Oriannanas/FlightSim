@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/xwing.x</SourceFile>
-  <SourceTime>2015-10-19T19:59:33.9100719+02:00</SourceTime>
+  <SourceFile>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/xwing.fbx</SourceFile>
+  <SourceTime>2015-10-22T17:39:50.483257+02:00</SourceTime>
   <DestFile>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/bin/Windows/xwing.xnb</DestFile>
-  <DestTime>2015-10-22T01:58:23.1286828+02:00</DestTime>
-  <Importer>OpenAssetImporter</Importer>
+  <DestTime>2015-10-22T17:39:54.5954599+02:00</DestTime>
+  <Importer>FbxImporter</Importer>
   <ImporterTime>2015-04-29T19:14:44+02:00</ImporterTime>
   <Processor>ModelProcessor</Processor>
   <ProcessorTime>2015-04-29T19:14:44+02:00</ProcessorTime>
@@ -65,6 +65,8 @@
     <Value>DxtCompressed</Value>
   </Parameters>
   <Dependencies />
-  <BuildAsset />
+  <BuildAsset>
+    <string>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/bin/Windows/xwing_0.xnb</string>
+  </BuildAsset>
   <BuildOutput />
 </PipelineBuildEvent>

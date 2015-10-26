@@ -19,8 +19,8 @@
 /processorParam:DebugMode=Auto
 /build:effects.fx
 
-#begin xwing.x
-/importer:OpenAssetImporter
+#begin xwing.fbx
+/importer:FbxImporter
 /processor:ModelProcessor
 /processorParam:ColorKeyColor=0,0,0,0
 /processorParam:ColorKeyEnabled=True
@@ -36,5 +36,5 @@
 /processorParam:Scale=1
 /processorParam:SwapWindingOrder=False
 /processorParam:TextureFormat=DxtCompressed
-/build:xwing.x
+/build:xwing.fbx
 

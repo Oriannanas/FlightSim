@@ -72,7 +72,7 @@ technique Pretransformed
 
 //------- Technique: Colored --------
 
-VertexToPixel ColoredVS( float4 inPos : SV_Position, float3 inNormal: NORMAL, float4 inColor: COLOR)
+VertexToPixel ColoredVS( float4 inPos : SV_Position, float4 inColor: COLOR, float3 inNormal: NORMAL)
 {	
 	VertexToPixel Output = (VertexToPixel)0;
 	float4x4 preViewProjection = mul (xView, xProjection);

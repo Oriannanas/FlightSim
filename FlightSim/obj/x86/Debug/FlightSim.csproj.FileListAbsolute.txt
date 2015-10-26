@@ -35,7 +35,8 @@ C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Wi
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\skybox.x
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\skybox2.x
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\target.x
-C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\xwing.x
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\effects.fx
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\effects.xnb
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\xwing.xnb
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\xwing_0.xnb
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\xwingText.png
