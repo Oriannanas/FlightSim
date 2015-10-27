@@ -66,6 +66,8 @@ namespace FlightSim
         Vector3 cameraUpDirection;
 
 
+        Quaternion cameraRotation = Quaternion.Identity;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -110,7 +112,7 @@ namespace FlightSim
 
             sceneryTexture = Content.Load<Texture2D>("texturemap");
             xwingTexture = Content.Load<Texture2D>("xwingText");
-            skyboxModel = LoadModel("skybox");
+            skyboxModel = LoadModel("skybox", out skyboxTextures);
 
             xwingModel = LoadModel("xwing");
             targetModel = LoadModel("target");
@@ -142,13 +144,21 @@ namespace FlightSim
 
         private Model LoadModel(string assetName, out Texture2D[] textures)
         {
-
+            int o = 0;
             Model newModel = Content.Load<Model>(assetName);
-            textures = new Texture2D[newModel.Meshes.Count];
+            foreach(ModelMesh mesh in newModel.Meshes)
+            {
+                    o += mesh.Effects.Count;
+            }
+            textures = new Texture2D[o];
+            Console.WriteLine(newModel.Meshes[0]);
             int i = 0;
             foreach (ModelMesh mesh in newModel.Meshes)
                 foreach (BasicEffect currentEffect in mesh.Effects)
-                    textures[i++] = currentEffect.Texture;
+                {
+                    textures[i] = currentEffect.Texture;
+                    i++;
+                }
 
             foreach (ModelMesh mesh in newModel.Meshes)
                 foreach (ModelMeshPart meshPart in mesh.MeshParts)
@@ -357,16 +367,17 @@ namespace FlightSim
 
         private void UpdateCamera()
         {
-            Vector3 campos = new Vector3(0, 0.1f, 0.6f);
-            campos = Vector3.Transform(campos, Matrix.CreateFromQuaternion(xwingRotation));
+            cameraRotation = Quaternion.Lerp(cameraRotation, xwingRotation, 0.3f);
+
+            Vector3 campos = new Vector3(0, 0.05f, 0.6f);
+            campos = Vector3.Transform(campos, Matrix.CreateFromQuaternion(cameraRotation));
             campos += xwingPosition;
 
             Vector3 camup = new Vector3(0, 1, 0);
-            camup = Vector3.Transform(camup, Matrix.CreateFromQuaternion(xwingRotation));
+            camup = Vector3.Transform(camup, Matrix.CreateFromQuaternion(cameraRotation));
 
             viewMatrix = Matrix.CreateLookAt(campos, xwingPosition, camup);
-            projectionMatrix = Matrix.CreatePerspectiveFieldOfView((float)Math.PI/3, GraphicsDevice.Viewport.AspectRatio, 0.2f, 500.0f);
-
+            projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 0.2f, 500.0f);
 
             cameraPosition = campos;
             cameraUpDirection = camup;
@@ -521,7 +532,7 @@ namespace FlightSim
         }
         private void DrawModel()
          {
-            Matrix worldMatrix = Matrix.CreateScale(0.1f, 0.1f, 0.1f) * Matrix.CreateRotationX(MathHelper.Pi / 2) * Matrix.CreateRotationZ(MathHelper.Pi) * Matrix.CreateFromQuaternion(xwingRotation) * Matrix.CreateTranslation(xwingPosition);
+            Matrix worldMatrix = Matrix.CreateScale(0.06f, 0.06f, 0.06f) * Matrix.CreateRotationX(MathHelper.Pi / 2) * Matrix.CreateRotationZ(MathHelper.Pi) * Matrix.CreateFromQuaternion(xwingRotation) * Matrix.CreateTranslation(xwingPosition);
 
             Matrix[] xwingTransforms = new Matrix[xwingModel.Bones.Count];
              xwingModel.CopyAbsoluteBoneTransformsTo(xwingTransforms);
@@ -626,7 +637,7 @@ namespace FlightSim
                     currentEffect.Parameters["xWorld"].SetValue(worldMatrix);
                     currentEffect.Parameters["xView"].SetValue(viewMatrix);
                     currentEffect.Parameters["xProjection"].SetValue(projectionMatrix);
-                    //currentEffect.Parameters["xTexture"].SetValue(skyboxTextures[i++]);
+                    currentEffect.Parameters["xTexture"].SetValue(skyboxTextures[i++]);
                 }
                 mesh.Draw();
             }
