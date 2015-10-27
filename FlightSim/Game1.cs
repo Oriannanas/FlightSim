@@ -15,6 +15,8 @@ namespace FlightSim
     /// </summary>
     public class Game1 : Game
     {
+        enum CollisionType { None, Building, Boundary, Target }
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
@@ -25,8 +27,15 @@ namespace FlightSim
 
         Vector3 lightDirection = new Vector3(3, -2, 5);
 
+        const int maxTargets = 50;
+        Model targetModel;
+
+        List<BoundingSphere> targetList = new List<BoundingSphere>();
+
         int[,] floorPlan;
         int[] buildingHeights = new int[] { 0, 2, 2, 6, 5, 4 };
+        BoundingBox[] buildingBoundingBoxes;
+        BoundingBox completeCityBox;
 
         VertexBuffer cityVertexBuffer;
 
@@ -41,10 +50,11 @@ namespace FlightSim
         float moveSpeed;
         // Up and down rotational variables
         Quaternion xwingRotation = Quaternion.Identity;
-        float UpDownAcceleration = 0.001f;
+        float UpDownAcceleration = 0.003f;
         float curUpDownRot = 0;
         float desUpDownRot = 0;
 
+        float gameSpeed = 1.0f;
 
 
         public Game1()
@@ -92,9 +102,12 @@ namespace FlightSim
             modelTexture = Content.Load<Texture2D>("xwingText");
 
             xwingModel = LoadModel("xwing");
+            targetModel = LoadModel("target");
 
             SetUpCamera();
 
+            SetUpBoundingBoxes();
+            AddTargets();
             SetUpVertices();
 
             // TODO: use this.Content to load your game content here
@@ -192,6 +205,7 @@ namespace FlightSim
 
             cityVertexBuffer.SetData<VertexPositionNormalTexture>(verticesList.ToArray());
         }
+
         private void LoadFloorPlan()
         {
 
@@ -228,6 +242,56 @@ namespace FlightSim
                         floorPlan[x, y] = random.Next(differentBuildings) + 1;
 
         }
+
+        private void SetUpBoundingBoxes()
+        {
+            int cityWidth = floorPlan.GetLength(0);
+            int cityLength = floorPlan.GetLength(1);
+
+
+            List<BoundingBox> bbList = new List<BoundingBox>(); for (int x = 0; x < cityWidth; x++)
+            {
+                for (int z = 0; z < cityLength; z++)
+                {
+                    int buildingType = floorPlan[x, z];
+                    if (buildingType != 0)
+                    {
+                        int buildingHeight = buildingHeights[buildingType];
+                        Vector3[] buildingPoints = new Vector3[2];
+                        buildingPoints[0] = new Vector3(x, 0, -z);
+                        buildingPoints[1] = new Vector3(x + 1, buildingHeight, -z - 1);
+                        BoundingBox buildingBox = BoundingBox.CreateFromPoints(buildingPoints);
+                        bbList.Add(buildingBox);
+                    }
+                }
+            }
+            buildingBoundingBoxes = bbList.ToArray();
+
+            Vector3[] boundaryPoints = new Vector3[2];
+            boundaryPoints[0] = new Vector3(0, 0, 0);
+            boundaryPoints[1] = new Vector3(cityWidth, 20, -cityLength);
+            completeCityBox = BoundingBox.CreateFromPoints(boundaryPoints);
+        }
+        private void AddTargets()
+        {
+            int cityWidth = floorPlan.GetLength(0);
+            int cityLength = floorPlan.GetLength(1);
+
+            Random random = new Random();
+
+            while (targetList.Count < maxTargets)
+            {
+                int x = random.Next(cityWidth);
+                int z = -random.Next(cityLength);
+                float y = (float)random.Next(2000) / 1000f + 1;
+                float radius = (float)random.Next(1000) / 1000f * 0.2f + 0.01f;
+
+                BoundingSphere newTarget = new BoundingSphere(new Vector3(x, y, z), radius);
+
+                if (CheckCollision(newTarget) == CollisionType.None)
+                    targetList.Add(newTarget);
+            }
+        }
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
         /// game-specific content.
@@ -248,8 +312,16 @@ namespace FlightSim
                 Exit();
             UpdateCamera();
             ProcessKeyboard(gameTime);
-
             MoveForward(ref xwingPosition, xwingRotation, moveSpeed);
+
+            BoundingSphere xwingSpere = new BoundingSphere(xwingPosition, 0.04f);
+            if (CheckCollision(xwingSpere) != CollisionType.None)
+            {
+                xwingPosition = new Vector3(8, 1, -3);
+                xwingRotation = Quaternion.Identity;
+                gameSpeed /= 1.1f;
+            }
+
             // TODO: Add your update logic here
 
             base.Update(gameTime);
@@ -269,8 +341,8 @@ namespace FlightSim
         }
         private void ProcessKeyboard(GameTime gameTime)
         {
-            moveSpeed = (gameTime.ElapsedGameTime.Milliseconds / 200.0f);
-            float turningSpeed = (float)gameTime.ElapsedGameTime.TotalMilliseconds / 1000.0f;
+            moveSpeed = (gameTime.ElapsedGameTime.Milliseconds / 350.0f)*gameSpeed;
+            float turningSpeed = ((float)gameTime.ElapsedGameTime.TotalMilliseconds / 350.0f)*gameSpeed;
 
             float leftRightRot = 0;
 
@@ -318,6 +390,27 @@ namespace FlightSim
             Quaternion additionalRot = Quaternion.CreateFromAxisAngle(new Vector3(0, 0, -1), leftRightRot) * Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), curUpDownRot);
             xwingRotation *= additionalRot;
         }
+        private CollisionType CheckCollision(BoundingSphere sphere)
+        {
+            for (int i = 0; i < buildingBoundingBoxes.Length; i++)
+                if (buildingBoundingBoxes[i].Contains(sphere) != ContainmentType.Disjoint)
+                    return CollisionType.Building;
+
+            if (completeCityBox.Contains(sphere) != ContainmentType.Contains)
+                return CollisionType.Boundary;
+
+            for (int i = 0; i < targetList.Count; i++)
+            {
+                if (targetList[i].Contains(sphere) != ContainmentType.Disjoint)
+                {
+                    targetList.RemoveAt(i);
+                    AddTargets();
+                    return CollisionType.Target;
+                }
+            }
+
+            return CollisionType.None;
+        }
 
         private void MoveForward(ref Vector3 position, Quaternion rotationQuat, float speed)
         {
@@ -336,6 +429,7 @@ namespace FlightSim
             DrawCity();
             DrawModel();
 
+            DrawTargets();
             base.Draw(gameTime);
         }
 
@@ -380,9 +474,29 @@ namespace FlightSim
                 mesh.Draw();
             }
         }
-    }
+        private void DrawTargets()
+        {
+            for (int i = 0; i < targetList.Count; i++)
+            {
+                Matrix worldMatrix = Matrix.CreateScale(targetList[i].Radius) * Matrix.CreateTranslation(targetList[i].Center);
 
-    struct VertexPositionNormalColor
-    {
+                Matrix[] targetTransforms = new Matrix[targetModel.Bones.Count];
+                targetModel.CopyAbsoluteBoneTransformsTo(targetTransforms);
+                foreach (ModelMesh modmesh in targetModel.Meshes)
+                {
+                    foreach (Effect currentEffect in modmesh.Effects)
+                    {
+                        currentEffect.CurrentTechnique = currentEffect.Techniques["Colored"];
+                        currentEffect.Parameters["xWorld"].SetValue(targetTransforms[modmesh.ParentBone.Index] * worldMatrix);
+                        currentEffect.Parameters["xView"].SetValue(viewMatrix);
+                        currentEffect.Parameters["xProjection"].SetValue(projectionMatrix);
+                        currentEffect.Parameters["xEnableLighting"].SetValue(true);
+                        currentEffect.Parameters["xLightDirection"].SetValue(lightDirection);
+                        currentEffect.Parameters["xAmbient"].SetValue(0.5f);
+                    }
+                    modmesh.Draw();
+                }
+            }
+        }
     }
 }

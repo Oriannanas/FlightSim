@@ -40,3 +40,4 @@ C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Wi
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\xwing.xnb
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\xwing_0.xnb
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\xwingText.png
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\target.xnb
