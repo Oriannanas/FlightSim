@@ -56,6 +56,12 @@ namespace FlightSim
 
         float gameSpeed = 1.0f;
 
+        Texture2D bulletTexture;
+
+        List<Bullet> bulletList = new List<Bullet>(); double lastBulletTime = 0;
+        Vector3 cameraPosition;
+        Vector3 cameraUpDirection;
+
 
         public Game1()
         {
@@ -97,6 +103,7 @@ namespace FlightSim
 
             effect = Content.Load<Effect>("effects");
             texture = Content.Load<Texture2D>("riemerstexture");
+            bulletTexture = Content.Load<Texture2D>("bullet");
 
             sceneryTexture = Content.Load<Texture2D>("texturemap");
             modelTexture = Content.Load<Texture2D>("xwingText");
@@ -105,10 +112,9 @@ namespace FlightSim
             targetModel = LoadModel("target");
 
             SetUpCamera();
-
+            SetUpVertices();
             SetUpBoundingBoxes();
             AddTargets();
-            SetUpVertices();
 
             // TODO: use this.Content to load your game content here
         }
@@ -312,6 +318,7 @@ namespace FlightSim
                 Exit();
             UpdateCamera();
             ProcessKeyboard(gameTime);
+            UpdateBulletPositions(moveSpeed);
             MoveForward(ref xwingPosition, xwingRotation, moveSpeed);
 
             BoundingSphere xwingSpere = new BoundingSphere(xwingPosition, 0.04f);
@@ -338,6 +345,11 @@ namespace FlightSim
 
             viewMatrix = Matrix.CreateLookAt(campos, xwingPosition, camup);
             projectionMatrix = Matrix.CreatePerspectiveFieldOfView((float)Math.PI/3, GraphicsDevice.Viewport.AspectRatio, 0.2f, 500.0f);
+
+
+            cameraPosition = campos;
+            cameraUpDirection = camup;
+
         }
         private void ProcessKeyboard(GameTime gameTime)
         {
@@ -367,6 +379,19 @@ namespace FlightSim
             else
             {
                 desUpDownRot = 0;
+            }
+            if (keys.IsKeyDown(Keys.Space))
+            {
+                double currentTime = gameTime.TotalGameTime.TotalMilliseconds;
+                if (currentTime - lastBulletTime > 100)
+                {
+                    Bullet newBullet = new Bullet();
+                    newBullet.position = xwingPosition;
+                    newBullet.rotation = xwingRotation;
+                    bulletList.Add(newBullet);
+
+                    lastBulletTime = currentTime;
+                }
             }
 
             if (curUpDownRot < desUpDownRot - UpDownAcceleration)
@@ -399,13 +424,16 @@ namespace FlightSim
             if (completeCityBox.Contains(sphere) != ContainmentType.Contains)
                 return CollisionType.Boundary;
 
-            for (int i = 0; i < targetList.Count; i++)
+            for (int i = 0; i < targetList.Count;)
             {
                 if (targetList[i].Contains(sphere) != ContainmentType.Disjoint)
                 {
-                    targetList.RemoveAt(i);
+                    targetList.Remove(targetList[i]);
                     AddTargets();
                     return CollisionType.Target;
+                }
+                else {
+                    i++;
                 }
             }
 
@@ -416,6 +444,25 @@ namespace FlightSim
         {
             Vector3 addVector = Vector3.Transform(new Vector3(0, 0, -1), rotationQuat);
             position += addVector * speed;
+        }
+        private void UpdateBulletPositions(float moveSpeed)
+        {
+            for (int i = 0; i < bulletList.Count; i++)
+            {
+                Bullet currentBullet = bulletList[i];
+                MoveForward(ref currentBullet.position, currentBullet.rotation, moveSpeed * 2.0f);
+                bulletList[i] = currentBullet;
+                BoundingSphere bulletSphere = new BoundingSphere(currentBullet.position, 0.05f);
+                CollisionType colType = CheckCollision(bulletSphere);
+                if (colType != CollisionType.None)
+                {
+                    bulletList.RemoveAt(i);
+                    i--;
+
+                    if (colType == CollisionType.Target)
+                        gameSpeed *= 1.05f;
+                }
+            }
         }
 
         /// <summary>
@@ -428,8 +475,8 @@ namespace FlightSim
 
             DrawCity();
             DrawModel();
-
             DrawTargets();
+            DrawBullets();
             base.Draw(gameTime);
         }
 
@@ -498,5 +545,49 @@ namespace FlightSim
                 }
             }
         }
+        private void DrawBullets()
+        {
+            if (bulletList.Count > 0)
+            {
+                VertexPositionTexture[] bulletVertices = new VertexPositionTexture[bulletList.Count * 6];
+                int i = 0;
+                foreach (Bullet currentBullet in bulletList)
+                {
+                    Vector3 center = currentBullet.position;
+
+                    bulletVertices[i++] = new VertexPositionTexture(center, new Vector2(1, 1));
+                    bulletVertices[i++] = new VertexPositionTexture(center, new Vector2(0, 0));
+                    bulletVertices[i++] = new VertexPositionTexture(center, new Vector2(1, 0));
+
+                    bulletVertices[i++] = new VertexPositionTexture(center, new Vector2(1, 1));
+                    bulletVertices[i++] = new VertexPositionTexture(center, new Vector2(0, 1));
+                    bulletVertices[i++] = new VertexPositionTexture(center, new Vector2(0, 0));
+                }
+
+
+                effect.CurrentTechnique = effect.Techniques["PointSprites"];
+                effect.Parameters["xWorld"].SetValue(Matrix.Identity);
+                effect.Parameters["xProjection"].SetValue(projectionMatrix);
+                effect.Parameters["xView"].SetValue(viewMatrix);
+                effect.Parameters["xCamPos"].SetValue(cameraPosition);
+                effect.Parameters["xTexture"].SetValue(bulletTexture);
+                effect.Parameters["xCamUp"].SetValue(cameraUpDirection);
+                effect.Parameters["xPointSpriteSize"].SetValue(0.1f);
+
+                GraphicsDevice.BlendState = BlendState.Additive;
+                foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+                {
+                    pass.Apply();
+                    GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, bulletVertices, 0, bulletList.Count * 2);
+                }
+                GraphicsDevice.BlendState = BlendState.Opaque;
+            }
+        }
+    }
+    struct Bullet
+    {
+        public Vector3 position;
+        public Quaternion rotation;
     }
 }
+
