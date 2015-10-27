@@ -39,12 +39,15 @@ namespace FlightSim
 
         VertexBuffer cityVertexBuffer;
 
+        Texture2D[] skyboxTextures;
+        Model skyboxModel;
+
         Texture2D sceneryTexture;
-        Texture2D modelTexture;
         Texture2D texture;
 
-        /*** the xwing variable ***/
+        /*** the xwing variables ***/
         Model xwingModel;
+        Texture2D xwingTexture;
 
         Vector3 xwingPosition = new Vector3(8, 1, -3);
         float moveSpeed;
@@ -106,7 +109,8 @@ namespace FlightSim
             bulletTexture = Content.Load<Texture2D>("bullet");
 
             sceneryTexture = Content.Load<Texture2D>("texturemap");
-            modelTexture = Content.Load<Texture2D>("xwingText");
+            xwingTexture = Content.Load<Texture2D>("xwingText");
+            skyboxModel = LoadModel("skybox");
 
             xwingModel = LoadModel("xwing");
             targetModel = LoadModel("target");
@@ -133,6 +137,23 @@ namespace FlightSim
                     meshPart.Effect = effect.Clone();
                 }
             }
+            return newModel;
+        }
+
+        private Model LoadModel(string assetName, out Texture2D[] textures)
+        {
+
+            Model newModel = Content.Load<Model>(assetName);
+            textures = new Texture2D[newModel.Meshes.Count];
+            int i = 0;
+            foreach (ModelMesh mesh in newModel.Meshes)
+                foreach (BasicEffect currentEffect in mesh.Effects)
+                    textures[i++] = currentEffect.Texture;
+
+            foreach (ModelMesh mesh in newModel.Meshes)
+                foreach (ModelMeshPart meshPart in mesh.MeshParts)
+                    meshPart.Effect = effect.Clone();
+
             return newModel;
         }
 
@@ -429,7 +450,6 @@ namespace FlightSim
                 if (targetList[i].Contains(sphere) != ContainmentType.Disjoint)
                 {
                     targetList.Remove(targetList[i]);
-                    AddTargets();
                     return CollisionType.Target;
                 }
                 else {
@@ -460,7 +480,7 @@ namespace FlightSim
                     i--;
 
                     if (colType == CollisionType.Target)
-                        gameSpeed *= 1.05f;
+                        gameSpeed *= 1.1f;
                 }
             }
         }
@@ -473,10 +493,11 @@ namespace FlightSim
         {
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.DarkSlateBlue, 1.0f, 0);
 
+            DrawSkybox();
             DrawCity();
-            DrawModel();
             DrawTargets();
             DrawBullets();
+            DrawModel();
             base.Draw(gameTime);
         }
 
@@ -499,28 +520,27 @@ namespace FlightSim
             }
         }
         private void DrawModel()
-        {
-
-            Matrix worldMatrix = Matrix.CreateScale(0.1f, 0.1f, 0.1f) * Matrix.CreateRotationX(MathHelper.Pi / 2) * Matrix.CreateRotationZ(MathHelper.Pi) * Matrix.CreateRotationY(MathHelper.Pi) * Matrix.CreateFromQuaternion(xwingRotation) * Matrix.CreateTranslation(xwingPosition);
+         {
+            Matrix worldMatrix = Matrix.CreateScale(0.1f, 0.1f, 0.1f) * Matrix.CreateRotationX(MathHelper.Pi / 2) * Matrix.CreateRotationZ(MathHelper.Pi) * Matrix.CreateFromQuaternion(xwingRotation) * Matrix.CreateTranslation(xwingPosition);
 
             Matrix[] xwingTransforms = new Matrix[xwingModel.Bones.Count];
-            xwingModel.CopyAbsoluteBoneTransformsTo(xwingTransforms);
-            foreach (ModelMesh mesh in xwingModel.Meshes)
-            {
-                foreach (Effect currentEffect in mesh.Effects)
-                {
-                    currentEffect.CurrentTechnique = currentEffect.Techniques["Textured"];
-                    currentEffect.Parameters["xWorld"].SetValue(xwingTransforms[mesh.ParentBone.Index] * worldMatrix);
-                    currentEffect.Parameters["xView"].SetValue(viewMatrix);
-                    currentEffect.Parameters["xProjection"].SetValue(projectionMatrix);
-                    effect.Parameters["xTexture"].SetValue(modelTexture);
-                    effect.Parameters["xEnableLighting"].SetValue(true);
-                    effect.Parameters["xLightDirection"].SetValue(lightDirection);
-                    effect.Parameters["xAmbient"].SetValue(0.5f);
-                }
-                mesh.Draw();
-            }
-        }
+             xwingModel.CopyAbsoluteBoneTransformsTo(xwingTransforms);
+             foreach (ModelMesh mesh in xwingModel.Meshes)
+             {
+                 foreach (Effect currentEffect in mesh.Effects)
+                 {
+                     currentEffect.CurrentTechnique = currentEffect.Techniques["Textured"];
+                     currentEffect.Parameters["xWorld"].SetValue(xwingTransforms[mesh.ParentBone.Index] * worldMatrix);
+                     currentEffect.Parameters["xView"].SetValue(viewMatrix);
+                     currentEffect.Parameters["xProjection"].SetValue(projectionMatrix);
+                     currentEffect.Parameters["xEnableLighting"].SetValue(true);
+                     currentEffect.Parameters["xLightDirection"].SetValue(lightDirection);
+                        currentEffect.Parameters["xTexture"].SetValue(xwingTexture);
+                        currentEffect.Parameters["xAmbient"].SetValue(0.5f);
+                 }
+                 mesh.Draw();
+             }
+         }
         private void DrawTargets()
         {
             for (int i = 0; i < targetList.Count; i++)
@@ -582,6 +602,38 @@ namespace FlightSim
                 }
                 GraphicsDevice.BlendState = BlendState.Opaque;
             }
+        }
+        private void DrawSkybox()
+        {
+            SamplerState ss = new SamplerState();
+            ss.AddressU = TextureAddressMode.Clamp;
+            ss.AddressV = TextureAddressMode.Clamp;
+            GraphicsDevice.SamplerStates[0] = ss;
+
+            DepthStencilState dss = new DepthStencilState();
+            dss.DepthBufferEnable = false;
+            GraphicsDevice.DepthStencilState = dss;
+
+            Matrix[] skyboxTransforms = new Matrix[skyboxModel.Bones.Count];
+            skyboxModel.CopyAbsoluteBoneTransformsTo(skyboxTransforms);
+            int i = 0;
+            foreach (ModelMesh mesh in skyboxModel.Meshes)
+            {
+                foreach (Effect currentEffect in mesh.Effects)
+                {
+                    Matrix worldMatrix = skyboxTransforms[mesh.ParentBone.Index] * Matrix.CreateTranslation(xwingPosition);
+                    currentEffect.CurrentTechnique = currentEffect.Techniques["Textured"];
+                    currentEffect.Parameters["xWorld"].SetValue(worldMatrix);
+                    currentEffect.Parameters["xView"].SetValue(viewMatrix);
+                    currentEffect.Parameters["xProjection"].SetValue(projectionMatrix);
+                    //currentEffect.Parameters["xTexture"].SetValue(skyboxTextures[i++]);
+                }
+                mesh.Draw();
+            }
+
+            dss = new DepthStencilState();
+            dss.DepthBufferEnable = true;
+            GraphicsDevice.DepthStencilState = dss;
         }
     }
     struct Bullet

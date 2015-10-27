@@ -3,7 +3,7 @@
   <SourceFile>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/xwing.fbx</SourceFile>
   <SourceTime>2015-10-22T17:39:50.483257+02:00</SourceTime>
   <DestFile>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/bin/Windows/xwing.xnb</DestFile>
-  <DestTime>2015-10-22T17:39:54.5954599+02:00</DestTime>
+  <DestTime>2015-10-27T19:43:34.725523+01:00</DestTime>
   <Importer>FbxImporter</Importer>
   <ImporterTime>2015-04-29T19:14:44+02:00</ImporterTime>
   <Processor>ModelProcessor</Processor>

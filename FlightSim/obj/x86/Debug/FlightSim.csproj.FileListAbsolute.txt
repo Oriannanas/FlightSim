@@ -41,3 +41,17 @@ C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Wi
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\xwing_0.xnb
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\xwingText.png
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\target.xnb
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\skybox.xnb
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\SkyBox_Back_0.xnb
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\SkyBox_Bottom_0.xnb
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\SkyBox_Front_0.xnb
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\SkyBox_Left_0.xnb
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\SkyBox_Right_0.xnb
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\SkyBox_Top_0.xnb
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\skybox2.xnb
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\SkyBox_Back_1.xnb
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\SkyBox_Bottom_1.xnb
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\SkyBox_Front_1.xnb
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\SkyBox_Left_1.xnb
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\SkyBox_Right_1.xnb
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\SkyBox_Top_1.xnb
