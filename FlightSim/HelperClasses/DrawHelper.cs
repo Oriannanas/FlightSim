@@ -137,6 +137,30 @@ namespace FlightSim
             }
             game.GraphicsDevice.BlendState = BlendState.Opaque;
         }
-        
+        public void Draw(VertexPositionColor[] vertices, int[] indices)
+        {
+            RasterizerState rs = new RasterizerState();
+            rs.CullMode = CullMode.None;
+            rs.FillMode = FillMode.WireFrame;
+            GraphicsDevice.RasterizerState = rs;
+
+            effect.CurrentTechnique = effect.Techniques["ColoredNoShading"];
+            effect.Parameters["xView"].SetValue(viewMatrix);
+            effect.Parameters["xProjection"].SetValue(projectionMatrix);
+            Matrix worldMatrix = Matrix.Identity;
+            effect.Parameters["xWorld"].SetValue(worldMatrix);
+
+            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+
+                GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, vertices.Length, indices, 0, indices.Length / 3, VertexPositionColor.VertexDeclaration);
+            }
+
+            RasterizerState es = new RasterizerState();
+            es.CullMode = CullMode.None;
+            es.FillMode = FillMode.WireFrame;
+            GraphicsDevice.RasterizerState = es;
+        }
     }
 }

@@ -32,13 +32,14 @@ namespace FlightSim
 
         Plane xwing;
         City city;
+        Terrain terrain;
         SkyBox skyBox;
         public List<Target> targetList { get; set; } = new List<Target>();
 
         Model xwingModel;
         Texture2D xwingTexture;
 
-        Texture2D[] skyboxTextures;
+        //Texture2D[] skyboxTextures;
         Texture2D skyboxTexture;
         Model skyboxModel;
 
@@ -108,6 +109,7 @@ namespace FlightSim
             targetModel = LoadModel("target");
 
             city = new City(this, sceneryTexture);
+            terrain = new Terrain(this);
             xwing = new Plane(this, xwingModel, xwingTexture, bulletTexture);
             skyBox = new SkyBox(this, skyboxModel, skyboxTexture);
             
@@ -251,6 +253,7 @@ namespace FlightSim
             {
                 target.Draw(drawHelper);
             }
+            terrain.Draw(drawHelper);
             base.Draw(gameTime);
         }
         

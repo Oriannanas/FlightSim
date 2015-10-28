@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Bullet.cs" />
     <Compile Include="City.cs" />
+    <Compile Include="Content\Terrain.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="HelperClasses\DrawHelper.cs" />
     <Compile Include="HelperClasses\VectorHelper.cs" />
