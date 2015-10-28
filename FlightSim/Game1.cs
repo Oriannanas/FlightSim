@@ -39,6 +39,7 @@ namespace FlightSim
         Texture2D xwingTexture;
 
         Texture2D[] skyboxTextures;
+        Texture2D skyboxTexture;
         Model skyboxModel;
 
         Texture2D sceneryTexture;
@@ -100,20 +101,15 @@ namespace FlightSim
 
             sceneryTexture = Content.Load<Texture2D>("texturemap");
             xwingTexture = Content.Load<Texture2D>("xwingText");
-            skyboxModel = LoadModel("skybox", out skyboxTextures);
-            /*skyboxTextures[0] = Content.Load<Texture2D>("skybox_top");      //0 = top
-            skyboxTextures[1] = Content.Load<Texture2D>("skybox_right");    //1 = right
-            skyboxTextures[2] = Content.Load<Texture2D>("skybox_left");     //2 = left
-            skyboxTextures[3] = Content.Load<Texture2D>("skybox_front");    //3 = front
-            skyboxTextures[4] = Content.Load<Texture2D>("skybox_back");     //4 = back
-            skyboxTextures[5] = Content.Load<Texture2D>("skybox_bottom");   //5 = bottom*/
+            skyboxModel = LoadModel("skybox");
+            skyboxTexture = Content.Load<Texture2D>("skyboxText");
 
             xwingModel = LoadModel("xwing");
             targetModel = LoadModel("target");
 
             city = new City(this, sceneryTexture);
             xwing = new Plane(this, xwingModel, xwingTexture, bulletTexture);
-            skyBox = new SkyBox(skyboxModel, skyboxTextures);
+            skyBox = new SkyBox(this, skyboxModel, skyboxTexture);
             
             // TODO: use this.Content to load your game content here
         }
@@ -144,7 +140,6 @@ namespace FlightSim
                     o += mesh.Effects.Count;
             }
             textures = new Texture2D[o];
-            Console.WriteLine(newModel.Meshes[0]);
             int i = 0;
             foreach (ModelMesh mesh in newModel.Meshes)
                 foreach (BasicEffect currentEffect in mesh.Effects)

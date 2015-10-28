@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <SourceFile>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/skybox2.x</SourceFile>
-  <SourceTime>2015-10-28T16:30:28.5277144+01:00</SourceTime>
+  <SourceTime>2015-10-28T17:50:28.7625816+01:00</SourceTime>
   <DestFile>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/bin/Windows/skybox2.xnb</DestFile>
-  <DestTime>2015-10-28T16:30:31.0408971+01:00</DestTime>
+  <DestTime>2015-10-28T17:50:29.6836083+01:00</DestTime>
   <Importer>XImporter</Importer>
   <ImporterTime>2015-04-29T19:14:44+02:00</ImporterTime>
   <Processor>ModelProcessor</Processor>
@@ -65,13 +65,6 @@
     <Value>DxtCompressed</Value>
   </Parameters>
   <Dependencies />
-  <BuildAsset>
-    <string>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/bin/Windows/SkyBox_Top_1.xnb</string>
-    <string>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/bin/Windows/SkyBox_Right_1.xnb</string>
-    <string>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/bin/Windows/SkyBox_Left_1.xnb</string>
-    <string>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/bin/Windows/SkyBox_Front_1.xnb</string>
-    <string>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/bin/Windows/SkyBox_Back_1.xnb</string>
-    <string>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/bin/Windows/SkyBox_Bottom_1.xnb</string>
-  </BuildAsset>
+  <BuildAsset />
   <BuildOutput />
 </PipelineBuildEvent>

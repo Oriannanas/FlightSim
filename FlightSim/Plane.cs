@@ -120,7 +120,7 @@ namespace FlightSim
             for (int i = 0; i < bulletList.Count; i++)
             {
                 Bullet currentBullet = bulletList[i];
-                currentBullet.position = currentBullet.position.MoveForward(currentBullet.rotation, moveSpeed * 2.0f);
+                currentBullet.position = currentBullet.position.MoveForward(currentBullet.rotation, moveSpeed * 4.0f);
                 bulletList[i] = currentBullet;
                 BoundingSphere bulletSphere = new BoundingSphere(currentBullet.position, 0.05f);
                 CollisionType colType = game.CheckCollision(bulletSphere);

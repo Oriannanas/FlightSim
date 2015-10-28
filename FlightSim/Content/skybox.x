@@ -170,9 +170,6 @@ Mesh Unnamed_0 {
      0.000000;
      1.000000;1.000000;1.000000;;
        0.000000;0.000000;0.000000;;
-          TextureFilename {
-      "SkyBox_Top.png";
-     }
      }
  }
   MeshNormals {
@@ -216,9 +213,6 @@ Mesh Unnamed_1 {
      0.000000;
      1.000000;1.000000;1.000000;;
        0.000000;0.000000;0.000000;;
-          TextureFilename {
-      "SkyBox_Right.png";
-     }
      }
  }
   MeshNormals {
@@ -263,9 +257,6 @@ Mesh Unnamed_2 {
      0.000000;
      1.000000;1.000000;1.000000;;
        0.000000;0.000000;0.000000;;
-          TextureFilename {
-      "SkyBox_Left.png";
-     }
      }
  }
   MeshNormals {
@@ -310,9 +301,6 @@ Mesh Unnamed_3 {
      0.000000;
      1.000000;1.000000;1.000000;;
        0.000000;0.000000;0.000000;;
-          TextureFilename {
-      "SkyBox_Front.png";
-     }
      }
  }
   MeshNormals {
@@ -357,9 +345,6 @@ Mesh Unnamed_4 {
      0.000000;
      1.000000;1.000000;1.000000;;
        0.000000;0.000000;0.000000;;
-          TextureFilename {
-      "SkyBox_Back.png";
-     }
      }
  }
   MeshNormals {
@@ -404,9 +389,6 @@ Mesh Unnamed_5 {
      0.000000;
      1.000000;1.000000;1.000000;;
        0.000000;0.000000;0.000000;;
-          TextureFilename {
-      "SkyBox_Bottom.png";
-     }
      }
  }
   MeshNormals {

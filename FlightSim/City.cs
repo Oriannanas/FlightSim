@@ -161,8 +161,8 @@ namespace FlightSim
             game.buildingBoundingBoxes = bbList.ToArray();
 
             Vector3[] boundaryPoints = new Vector3[2];
-            boundaryPoints[0] = new Vector3(0, 0, 0);
-            boundaryPoints[1] = new Vector3(cityWidth, 20, -cityLength);
+            boundaryPoints[0] = new Vector3(-cityWidth, 0, cityLength);
+            boundaryPoints[1] = new Vector3(cityWidth*2, 40, -cityLength*2);
             game.completeCityBox = BoundingBox.CreateFromPoints(boundaryPoints);
         }
         private void AddTargets()

@@ -29,11 +29,7 @@ C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Wi
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\skybox.x
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\target.x
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\xwingText.png
-C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\skybox_back.png
-C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\skybox_front.png
-C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\skybox_left.png
-C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\skybox_right.png
-C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\skybox_top.png
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\skyboxText.jpg
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\effects.fx
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\effects.xnb
 C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\Content\skybox.xnb
