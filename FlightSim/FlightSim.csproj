@@ -53,9 +53,16 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Bullet.cs" />
+    <Compile Include="City.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="HelperClasses\DrawHelper.cs" />
+    <Compile Include="HelperClasses\VectorHelper.cs" />
+    <Compile Include="Plane.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SkyBox.cs" />
+    <Compile Include="Target.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
