@@ -127,7 +127,7 @@ namespace FlightSim
             effect.Parameters["xCamPos"].SetValue(game.cameraPosition);
             effect.Parameters["xTexture"].SetValue(texture);
             effect.Parameters["xCamUp"].SetValue(game.cameraUpDirection);
-            effect.Parameters["xPointSpriteSize"].SetValue(0.1f);
+            effect.Parameters["xPointSpriteSize"].SetValue(0.05f);
 
             GraphicsDevice.BlendState = BlendState.Additive;
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)

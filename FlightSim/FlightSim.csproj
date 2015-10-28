@@ -79,25 +79,24 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\effects.fx" />
+    <Content Include="Content\skybox.jpg" />
     <Content Include="Content\riemerstexture.bmp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\skybox_back.JPG">
+    <Content Include="Content\skybox_back.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\skybox_bottom.JPG">
+    <Content Include="Content\skybox_bottom.png" />
+    <Content Include="Content\skybox_front.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\skybox_front.JPG">
+    <Content Include="Content\skybox_left.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\skybox_left.JPG">
+    <Content Include="Content\skybox_right.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\skybox_right.JPG">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Content\skybox_top.JPG">
+    <Content Include="Content\skybox_top.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\texturemap.jpg">
@@ -132,14 +131,12 @@
     <Content Include="Content\skybox.x">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Content\skybox2.x">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="Content\target.x">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Content\skybox2.x" />
     <None Include="Content\xwing.fbx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
