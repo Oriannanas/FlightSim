@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/xwing.fbx</SourceFile>
-  <SourceTime>2015-10-22T17:39:50.483257+02:00</SourceTime>
-  <DestFile>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/bin/Windows/xwing.xnb</DestFile>
-  <DestTime>2015-10-27T19:43:34.725523+01:00</DestTime>
+  <SourceFile>C:/Users/Marijn/Desktop/Projects/FlightSim/FlightSim/Content/xwing.fbx</SourceFile>
+  <SourceTime>2015-10-27T01:19:34.4243942+01:00</SourceTime>
+  <DestFile>C:/Users/Marijn/Desktop/Projects/FlightSim/FlightSim/Content/bin/Windows/xwing.xnb</DestFile>
+  <DestTime>2015-10-29T09:48:16.9980751+01:00</DestTime>
   <Importer>FbxImporter</Importer>
   <ImporterTime>2015-04-29T19:14:44+02:00</ImporterTime>
   <Processor>ModelProcessor</Processor>
@@ -66,7 +66,7 @@
   </Parameters>
   <Dependencies />
   <BuildAsset>
-    <string>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/bin/Windows/xwing_0.xnb</string>
+    <string>C:/Users/Marijn/Desktop/Projects/FlightSim/FlightSim/Content/bin/Windows/xwing_0.xnb</string>
   </BuildAsset>
   <BuildOutput />
 </PipelineBuildEvent>

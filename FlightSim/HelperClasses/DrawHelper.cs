@@ -159,7 +159,7 @@ namespace FlightSim
 
             RasterizerState es = new RasterizerState();
             es.CullMode = CullMode.None;
-            es.FillMode = FillMode.WireFrame;
+            es.FillMode = FillMode.Solid;
             GraphicsDevice.RasterizerState = es;
         }
     }
