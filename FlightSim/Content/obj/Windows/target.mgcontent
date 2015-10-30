@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/Marijn/Desktop/Projects/FlightSim/FlightSim/Content/target.x</SourceFile>
-  <SourceTime>2015-10-27T01:19:34.4063617+01:00</SourceTime>
-  <DestFile>C:/Users/Marijn/Desktop/Projects/FlightSim/FlightSim/Content/bin/Windows/target.xnb</DestFile>
-  <DestTime>2015-10-29T09:48:17.0762037+01:00</DestTime>
+  <SourceFile>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/target.x</SourceFile>
+  <SourceTime>2015-10-19T19:59:37.7661103+02:00</SourceTime>
+  <DestFile>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/bin/Windows/target.xnb</DestFile>
+  <DestTime>2015-10-29T15:36:52.7116245+01:00</DestTime>
   <Importer>XImporter</Importer>
   <ImporterTime>2015-04-29T19:14:44+02:00</ImporterTime>
   <Processor>ModelProcessor</Processor>

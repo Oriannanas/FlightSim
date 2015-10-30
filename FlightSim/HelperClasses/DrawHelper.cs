@@ -137,7 +137,7 @@ namespace FlightSim
             }
             game.GraphicsDevice.BlendState = BlendState.Opaque;
         }
-        public void Draw(VertexPositionColor[] vertices, int[] indices)
+        public void Draw(VertexPositionColor[] vertices, short[] indices, Matrix worldMatrix)
         {
             RasterizerState rs = new RasterizerState();
             rs.CullMode = CullMode.None;
@@ -147,7 +147,6 @@ namespace FlightSim
             effect.CurrentTechnique = effect.Techniques["ColoredNoShading"];
             effect.Parameters["xView"].SetValue(viewMatrix);
             effect.Parameters["xProjection"].SetValue(projectionMatrix);
-            Matrix worldMatrix = Matrix.Identity;
             effect.Parameters["xWorld"].SetValue(worldMatrix);
 
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)

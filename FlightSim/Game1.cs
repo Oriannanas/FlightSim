@@ -32,7 +32,7 @@ namespace FlightSim
 
         Plane xwing;
         City city;
-        Terrain terrain;
+        Terrain terrain, terrain2;
         SkyBox skyBox;
         public List<Target> targetList { get; set; } = new List<Target>();
 
@@ -109,7 +109,8 @@ namespace FlightSim
             targetModel = LoadModel("target");
 
             city = new City(this, sceneryTexture);
-            terrain = new Terrain(this);
+            terrain = new Terrain(this, new Vector2(0,0), 16,7);
+            terrain2 = new Terrain(this, new Vector2(1, 0), 16, 7);
             xwing = new Plane(this, xwingModel, xwingTexture, bulletTexture);
             skyBox = new SkyBox(this, skyboxModel, skyboxTexture);
             
@@ -182,12 +183,11 @@ namespace FlightSim
 
             
 
-            if (CheckCollision(xwingSpere) != CollisionType.None)
+            /*if (CheckCollision(xwingSpere) != CollisionType.None)
             {
                 xwing.ResetPosition();
                 gameSpeed /= 1.1f;
-            }
-
+            }*/
             // TODO: Add your update logic here
 
             base.Update(gameTime);
@@ -197,7 +197,7 @@ namespace FlightSim
         {
             cameraRotation = Quaternion.Lerp(cameraRotation, xwing.rotation, 0.3f);
 
-            Vector3 campos = new Vector3(0, 0.05f, 0.6f);
+            Vector3 campos = new Vector3(0, 0.1f, 0.6f);
             campos = Vector3.Transform(campos, Matrix.CreateFromQuaternion(cameraRotation));
             campos += xwing.position;
 
@@ -247,13 +247,14 @@ namespace FlightSim
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.DarkSlateBlue, 1.0f, 0);
             
             skyBox.Draw(drawHelper);
-            city.Draw(drawHelper);
+            //city.Draw(drawHelper);
             xwing.Draw(drawHelper);
             foreach( Target target in targetList)
             {
                 target.Draw(drawHelper);
             }
             terrain.Draw(drawHelper);
+            terrain2.Draw(drawHelper);
             base.Draw(gameTime);
         }
         

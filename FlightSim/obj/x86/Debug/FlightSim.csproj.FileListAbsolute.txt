@@ -100,3 +100,7 @@ C:\Users\Marijn\Desktop\Projects\FlightSim\FlightSim\bin\Windows\Debug\SharpDX.X
 C:\Users\Marijn\Desktop\Projects\FlightSim\FlightSim\bin\Windows\Debug\SharpDX.RawInput.xml
 C:\Users\Marijn\Desktop\Projects\FlightSim\FlightSim\bin\Windows\Debug\SharpDX.Direct3D9.xml
 C:\Users\Marijn\Desktop\Projects\FlightSim\FlightSim\obj\x86\Debug\FlightSim.csprojResolveAssemblyReference.cache
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\FlightSim.exe.manifest
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\bin\Windows\Debug\FlightSim.application
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\obj\x86\Debug\FlightSim.exe.manifest
+C:\Users\marijn\Documents\Visual Studio 2015\Projects\FlightSim\FlightSim\obj\x86\Debug\FlightSim.application

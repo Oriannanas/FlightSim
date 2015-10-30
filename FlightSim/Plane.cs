@@ -45,26 +45,30 @@ namespace FlightSim
             float turningSpeed = ((float)gameTime.ElapsedGameTime.TotalMilliseconds / 1000.0f) * game.gameSpeed;
 
             float leftRightRot = 0;
-            
+
             KeyboardState keys = Keyboard.GetState();
             if (keys.IsKeyDown(Keys.Right))
-                leftRightRot += turningSpeed;
+                leftRightRot += turningSpeed*1.6f;
             if (keys.IsKeyDown(Keys.Left))
-                leftRightRot -= turningSpeed;
+                leftRightRot -= turningSpeed * 1.6f;
 
             if (keys.IsKeyDown(Keys.W))
             {
                 moveSpeed *= 1.5f;
             }
-            if (keys.IsKeyDown(Keys.S))
+            else if (keys.IsKeyDown(Keys.S))
             {
-                moveSpeed *= 0.5f;
+                moveSpeed *= -1.5f;
+            }
+            else
+            {
+                moveSpeed = 0;
             }
 
             if (keys.IsKeyDown(Keys.Down))
-                desUpDownRot += turningSpeed;
-            else if (keys.IsKeyDown(Keys.Up))
                 desUpDownRot -= turningSpeed;
+            else if (keys.IsKeyDown(Keys.Up))
+                desUpDownRot += turningSpeed;
             else
             {
                 desUpDownRot = 0;
