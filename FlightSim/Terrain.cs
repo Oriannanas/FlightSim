@@ -12,16 +12,14 @@ namespace FlightSim
         Vector2 position;
         Random rng = new Random();
         Game1 game;
-        short[] indices;
+        int[] indices;
         int iterations;
         int width;
         int maxHeight;
         VertexPositionColor[] verticeList;
         float detail;
-        //VertexBuffer vertexBuffer;
-
-        //int width;
-        //int height;
+        VertexBuffer vertexBuffer;
+        IndexBuffer indexBuffer;
 
         public Terrain(Game1 game, Vector2 position, int width, int iterations, float detail)
         {
@@ -30,28 +28,31 @@ namespace FlightSim
             this.width = width;
             this.iterations = iterations;
             this.detail = detail;
-            this.maxHeight = width / 2;
+            this.maxHeight = 128;
             SetUpVertices();
             SetUpIndices();
+
+            CopyToBuffers();
         }
 
         private void SetUpVertices()
         {
             verticeList = new VertexPositionColor[4];
-            Console.WriteLine(((float)rng.NextDouble() - 0.5f) * 16);
 
-            verticeList[0].Position = new Vector3(0f, (((float)rng.NextDouble() - 0.5f) * maxHeight), 0f);
+            verticeList[0].Position = new Vector3(0f, (((float)rng.NextDouble() - 0.5f) * maxHeight/2), 0f);
             verticeList[0].Color = Color.White;
-            verticeList[1].Position = new Vector3(width/2 + position.X*width, (((float)rng.NextDouble() - 0.5f) * maxHeight), 0f);
+            verticeList[1].Position = new Vector3(width/2 + position.X*width, (((float)rng.NextDouble() - 0.5f) * maxHeight/2), 0f);
             verticeList[1].Color = Color.White;
-            verticeList[2].Position = new Vector3(0f, (((float)rng.NextDouble() - 0.5f) * maxHeight), -width/2 - position.Y*width);
+            verticeList[2].Position = new Vector3(0f, (((float)rng.NextDouble() - 0.5f) * maxHeight/2), -width/2 - position.Y*width);
             verticeList[2].Color = Color.White;
-            verticeList[3].Position = new Vector3(width/2 + position.X*width, (((float)rng.NextDouble() - 0.5f) * maxHeight), -width/2 - position.Y*width);
+            verticeList[3].Position = new Vector3(width/2 + position.X*width, (((float)rng.NextDouble() - 0.5f) * maxHeight/2), -width/2 - position.Y*width);
             verticeList[3].Color = Color.White;
 
             //make a new array to save the vertices in
             //the new array should be (number of iterations+1)^2
             //iter stands for iteration
+            float lowestY = 0;
+            float highestY = 0;
             for (int iter = 0; iter < iterations; iter++)
             {
                 VertexPositionColor[] tempList = new VertexPositionColor[(int)(Math.Pow(Math.Pow(2, iter + 1) + 1, 2))];
@@ -80,6 +81,14 @@ namespace FlightSim
                         //transfer the square's vertices to the new array
                         tempList[bottomRightPointIndex].Position = verticeList[((y + 1) * oldVerticeRow) + (x) + 1].Position;
 
+                        if (tempList[topLeftPointIndex].Position.Y < lowestY)
+                        {
+                            lowestY = tempList[topLeftPointIndex].Position.Y;
+                        }
+                        if (tempList[topLeftPointIndex].Position.Y > highestY)
+                        {
+                            highestY = tempList[topLeftPointIndex].Position.Y;
+                        }
                         if (y == 0)
                         {
                             tempList[topLeftPointIndex].Position = verticeList[(y * oldVerticeRow) + x].Position;
@@ -174,6 +183,7 @@ namespace FlightSim
                     verticeList[i].Color = Color.White;
                 }
             }
+            Console.WriteLine(maxHeight +  " ... " +  lowestY + " & " + highestY);
 
         }
         private void SetUpIndices()
@@ -182,20 +192,20 @@ namespace FlightSim
             int squareRow = (int)Math.Pow(2, iterations );
             int verticeRow = (int)(Math.Pow(2, iterations ) + 1);
 
-            indices = new short[amountOfIndices];
+            indices = new int[amountOfIndices];
 
             int index = 0;
             for (int y = 0; y < squareRow; y++)
             {
                 for (int x = 0; x < squareRow; x++)
                 {
-                    indices[index++] = (short)(y * verticeRow + x);
-                    indices[index++] = (short)(y * verticeRow + x + 1);
-                    indices[index++] = (short)((y+1) * verticeRow + x);
+                    indices[index++] = (y * verticeRow + x);
+                    indices[index++] = (y * verticeRow + x + 1);
+                    indices[index++] = ((y+1) * verticeRow + x);
 
-                    indices[index++] = (short)(y * verticeRow + x+1);
-                    indices[index++] = (short)((y + 1) * verticeRow + x);
-                    indices[index++] = (short)((y + 1) * verticeRow + x+1);
+                    indices[index++] = (y * verticeRow + x+1);
+                    indices[index++] = ((y + 1) * verticeRow + x);
+                    indices[index++] = ((y + 1) * verticeRow + x+1);
                 }
             }
         }
@@ -204,7 +214,8 @@ namespace FlightSim
         public Vector3 AverageDiamond(Vector3 vec1, Vector3 vec2, Vector3 middlePoint, int iteration)
         {
             float newX = (vec1.X + vec2.X) / 2;
-            float newY = ((vec1.Y + vec2.Y + middlePoint.Y) / 3) + ((((float)rng.NextDouble() - 0.5f) * width / 4) / (float)Math.Pow((iteration + 1),detail));
+            float newY = ((vec1.Y + vec2.Y + middlePoint.Y) / 3);
+            newY += (((float)rng.NextDouble() - 0.5f - (0.5f * (newY / (maxHeight / 2)))) * maxHeight) / (float)Math.Pow(detail + 1, iteration);
             float newZ = (vec1.Z + vec2.Z) / 2;
             Vector3 newVector = new Vector3(newX, newY, newZ);
             return newVector;
@@ -213,17 +224,25 @@ namespace FlightSim
         {
             float newX = (vec1.X + vec2.X + vec3.X + vec4.X) / 4;
             float newY = ((vec1.Y + vec2.Y + vec3.Y + vec4.Y) / 4);
-            newY += (((float)rng.NextDouble() - 0.5f) * maxHeight  *(newY / maxHeight)) / (float)Math.Pow((iteration + 1), detail);
+            newY += (((float)rng.NextDouble() - 0.5f - (0.5f* (newY / (maxHeight / 2)))) * maxHeight) / (float)Math.Pow(detail + 1, iteration);
             float newZ = (vec1.Z + vec2.Z + vec3.Z + vec4.Z) / 4;
             Vector3 newVector = new Vector3(newX, newY, newZ);
             return newVector;
+        }
+        private void CopyToBuffers()
+        {
+            vertexBuffer = new VertexBuffer(game.GraphicsDevice, VertexPositionColor.VertexDeclaration, verticeList.Length, BufferUsage.WriteOnly);
+            vertexBuffer.SetData(verticeList);
+
+            indexBuffer = new IndexBuffer(game.GraphicsDevice, typeof(int), indices.Length, BufferUsage.WriteOnly);
+            indexBuffer.SetData(indices);
         }
 
         public void Draw(DrawHelper drawHelper)
         {
             Matrix worldMatrix = Matrix.Identity;
-
-            drawHelper.Draw(verticeList, indices, worldMatrix);
+            drawHelper.Draw(vertexBuffer, indexBuffer, verticeList.Length, indices.Length, worldMatrix);
+            //drawHelper.Draw(verticeList, indices, worldMatrix);
         }
     }
     public struct VertexPositionColorNormal

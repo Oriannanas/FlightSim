@@ -23,8 +23,11 @@ namespace FlightSim
         // Up and down rotational variables
         public Quaternion rotation { get; private set; } = Quaternion.Identity;
         float UpDownAcceleration = 0.003f;
+        float leftRightAcceleration = 0.003f;
         float curUpDownRot = 0;
         float desUpDownRot = 0;
+        float curLeftRightRot = 0;
+        float desLeftRightRot = 0;
 
         List<Bullet> bulletList = new List<Bullet>();
 
@@ -41,7 +44,7 @@ namespace FlightSim
             UpdateBullets();
             position = position.MoveForward(rotation, moveSpeed);
 
-            moveSpeed = (gameTime.ElapsedGameTime.Milliseconds / 750.0f) * game.gameSpeed;
+            moveSpeed = (gameTime.ElapsedGameTime.Milliseconds / 200.0f) * game.gameSpeed;
             float turningSpeed = ((float)gameTime.ElapsedGameTime.TotalMilliseconds / 1000.0f) * game.gameSpeed;
 
             float leftRightRot = 0;
@@ -65,11 +68,20 @@ namespace FlightSim
                 moveSpeed = 0;
             }
 
+            if (keys.IsKeyDown(Keys.A))
+                desLeftRightRot = -turningSpeed;
+           if (keys.IsKeyDown(Keys.D))
+                desLeftRightRot = turningSpeed;
+            if (keys.IsKeyUp(Keys.A) && keys.IsKeyUp(Keys.D))
+            {
+                desLeftRightRot = 0;
+            }
+
+            if (keys.IsKeyDown(Keys.Up))
+                desUpDownRot = -turningSpeed;
             if (keys.IsKeyDown(Keys.Down))
-                desUpDownRot -= turningSpeed;
-            else if (keys.IsKeyDown(Keys.Up))
-                desUpDownRot += turningSpeed;
-            else
+                desUpDownRot = turningSpeed;
+            if(keys.IsKeyUp(Keys.Down) && keys.IsKeyUp(Keys.Up))
             {
                 desUpDownRot = 0;
             }
@@ -103,7 +115,26 @@ namespace FlightSim
             {
                 curUpDownRot = desUpDownRot;
             }
-            Quaternion additionalRot = Quaternion.CreateFromAxisAngle(new Vector3(0, 0, -1), leftRightRot) * Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), curUpDownRot);
+
+            if (curLeftRightRot < desLeftRightRot - leftRightAcceleration)
+            {
+                if (curLeftRightRot < turningSpeed)
+                {
+                    curLeftRightRot += leftRightAcceleration;
+                }
+            }
+            else if (curLeftRightRot > desLeftRightRot + leftRightAcceleration)
+            {
+                if (curLeftRightRot > -turningSpeed)
+                {
+                    curLeftRightRot -= leftRightAcceleration;
+                }
+            }
+            else
+            {
+                curLeftRightRot = desLeftRightRot;
+            }
+            Quaternion additionalRot = Quaternion.CreateFromAxisAngle(new Vector3(0, 0, -1), leftRightRot) * Quaternion.CreateFromAxisAngle(new Vector3(-1, 0, 0), curUpDownRot) * Quaternion.CreateFromAxisAngle(new Vector3(0, -1, 0), curLeftRightRot);
             rotation *= additionalRot;
         }
         

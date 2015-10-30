@@ -137,7 +137,7 @@ namespace FlightSim
             }
             game.GraphicsDevice.BlendState = BlendState.Opaque;
         }
-        public void Draw(VertexPositionColor[] vertices, short[] indices, Matrix worldMatrix)
+        public void Draw(VertexPositionColor[] vertices, int[] indices, Matrix worldMatrix)
         {
             RasterizerState rs = new RasterizerState();
             rs.CullMode = CullMode.None;
@@ -154,6 +154,35 @@ namespace FlightSim
                 pass.Apply();
 
                 GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, vertices.Length, indices, 0, indices.Length / 3, VertexPositionColor.VertexDeclaration);
+            }
+
+            RasterizerState es = new RasterizerState();
+            es.CullMode = CullMode.None;
+            es.FillMode = FillMode.Solid;
+            GraphicsDevice.RasterizerState = es;
+        }
+
+        public void Draw(VertexBuffer vertices, IndexBuffer indices, int verticesLength, int indicesLength, Matrix worldMatrix)
+        {
+            RasterizerState rs = new RasterizerState();
+            rs.CullMode = CullMode.None;
+            rs.FillMode = FillMode.WireFrame;
+            GraphicsDevice.RasterizerState = rs;
+
+            effect.CurrentTechnique = effect.Techniques["ColoredNoShading"];
+            effect.Parameters["xView"].SetValue(viewMatrix);
+            effect.Parameters["xProjection"].SetValue(projectionMatrix);
+            effect.Parameters["xWorld"].SetValue(worldMatrix);
+
+            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
+            {
+                pass.Apply();
+
+                GraphicsDevice.Indices = indices;
+
+                GraphicsDevice.SetVertexBuffer(vertices);
+
+                GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, verticesLength, 0, indicesLength / 3);
             }
 
             RasterizerState es = new RasterizerState();

@@ -20,6 +20,7 @@ namespace FlightSim
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        DrawHelper drawHelper;
 
         Effect effect;
 
@@ -46,7 +47,6 @@ namespace FlightSim
         Texture2D sceneryTexture;
         Texture2D texture;
 
-        DrawHelper drawHelper;
 
         public float gameSpeed { get; set; } = 1.0f;
 
@@ -109,7 +109,7 @@ namespace FlightSim
             targetModel = LoadModel("target");
 
             city = new City(this, sceneryTexture);
-            terrain = new Terrain(this, new Vector2(0,0), 128,7, 1.75f);
+            terrain = new Terrain(this, new Vector2(0,0), 1024,11, 0.85f);
             xwing = new Plane(this, xwingModel, xwingTexture, bulletTexture);
             skyBox = new SkyBox(this, skyboxModel, skyboxTexture);
             
