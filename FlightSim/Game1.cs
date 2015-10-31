@@ -109,7 +109,7 @@ namespace FlightSim
             targetModel = LoadModel("target");
 
             city = new City(this, sceneryTexture);
-            terrain = new Terrain(this, new Vector2(0,0), 1024, 11, 256, 1f);
+            terrain = new Terrain(this, new Vector2(0,0), 4096, 1024, 11, 6, 0.75f);
             xwing = new Plane(this, xwingModel, xwingTexture, bulletTexture);
             skyBox = new SkyBox(this, skyboxModel, skyboxTexture);
             
@@ -204,7 +204,7 @@ namespace FlightSim
             camup = Vector3.Transform(camup, Matrix.CreateFromQuaternion(cameraRotation));
 
             drawHelper.viewMatrix = Matrix.CreateLookAt(campos, xwing.position, camup);
-            drawHelper.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 0.2f, 1000);
+            drawHelper.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 0.2f, 4000);
 
             cameraPosition = campos;
             cameraUpDirection = camup;

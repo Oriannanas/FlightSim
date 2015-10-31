@@ -18,30 +18,29 @@ namespace FlightSim
         int width;
         int maxHeight;
         VertexPositionNormalColored[] verticeList;
-        VertexPositionNormalColored[] verticeList2;
         int verticesListLength;
         int indicesListLength;
         float detail;
         VertexBuffer vertexBuffer;
         IndexBuffer indexBuffer;
 
-        public Terrain(Game1 game, Vector2 position, int width, int iterations, int terrainHeight, float detail)
+        public Terrain(Game1 game, Vector2 position, int width, int terrainHeight, int iterations, float mountainy, float roughness)
         {
             this.game = game;
             this.position = position;
             this.width = width;
             this.iterations = iterations;
-            this.detail = detail;
+            this.detail = roughness;
             this.maxHeight = terrainHeight;
             SetUpVertices();
-            verticeList2 = verticeList;
-            maxHeight = 1;
-            SetUpVertices();
 
-            for(int i= 0; i < verticeList.Length; i++)
+
+            for (int i = 0; i < verticeList.Length; i++)
             {
-                verticeList[i].Position.Y += 1;
-                verticeList[i].Position.Y *= verticeList2[i].Position.Y;
+                verticeList[i].Position.Y *= (float)Math.Pow(verticeList[i].Position.Y, mountainy);
+                verticeList[i].Position.Y /= (float)Math.Pow(maxHeight, mountainy);
+                if (verticeList[i].Position.Y < 0)
+                    Console.WriteLine(verticeList[i].Position.Y);
             }
 
             SetUpIndices();
@@ -195,7 +194,7 @@ namespace FlightSim
                 verticeList[i].Position.Y += maxHeight / 2;
                 verticeList[i].Color = Color.Green;
             }
-            GimmeDatImage(verticeList);
+            //GimmeDatImage(verticeList);
 
         }
         private void SetUpIndices()
@@ -275,7 +274,11 @@ namespace FlightSim
         {
             float newX = (vec1.X + vec2.X) / 2;
             float newY = ((vec1.Y + vec2.Y + middlePoint.Y) / 3);
-            newY += (((float)rng.NextDouble() - 0.5f) * maxHeight/2) / (float)Math.Pow(detail + 1, iteration);
+            newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(detail + 1, iteration);
+            while (newY < -maxHeight / 2 || newY > maxHeight / 2)
+            {
+                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(detail + 1, iteration);
+            }
             float newZ = (vec1.Z + vec2.Z) / 2;
             Vector3 newVector = new Vector3(newX, newY, newZ);
             return newVector;
@@ -284,7 +287,11 @@ namespace FlightSim
         {
             float newX = (vec1.X + vec2.X + vec3.X + vec4.X) / 4;
             float newY = ((vec1.Y + vec2.Y + vec3.Y + vec4.Y) / 4);
-            newY += (((float)rng.NextDouble() - 0.5f ) * maxHeight/2) / (float)Math.Pow(detail + 1, iteration);
+            newY += (((float)rng.NextDouble() - 0.5f) * maxHeight / 2) / (float)Math.Pow(detail + 1, iteration);
+            while (newY < -maxHeight / 2 || newY > maxHeight / 2)
+            {
+                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight / 2) / (float)Math.Pow(detail + 1, iteration);
+            }
             float newZ = (vec1.Z + vec2.Z + vec3.Z + vec4.Z) / 4;
             Vector3 newVector = new Vector3(newX, newY, newZ);
             return newVector;

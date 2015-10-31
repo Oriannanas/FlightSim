@@ -44,7 +44,7 @@ namespace FlightSim
             UpdateBullets();
             position = position.MoveForward(rotation, moveSpeed);
 
-            moveSpeed = (gameTime.ElapsedGameTime.Milliseconds / 200.0f) * game.gameSpeed;
+            moveSpeed = (gameTime.ElapsedGameTime.Milliseconds / 50.0f) * game.gameSpeed;
             float turningSpeed = ((float)gameTime.ElapsedGameTime.TotalMilliseconds / 1000.0f) * game.gameSpeed;
 
             float leftRightRot = 0;
