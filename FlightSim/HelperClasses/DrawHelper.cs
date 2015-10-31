@@ -137,42 +137,21 @@ namespace FlightSim
             }
             game.GraphicsDevice.BlendState = BlendState.Opaque;
         }
-        public void Draw(VertexPositionColor[] vertices, int[] indices, Matrix worldMatrix)
-        {
-            RasterizerState rs = new RasterizerState();
-            rs.CullMode = CullMode.None;
-            rs.FillMode = FillMode.WireFrame;
-            GraphicsDevice.RasterizerState = rs;
-
-            effect.CurrentTechnique = effect.Techniques["ColoredNoShading"];
-            effect.Parameters["xView"].SetValue(viewMatrix);
-            effect.Parameters["xProjection"].SetValue(projectionMatrix);
-            effect.Parameters["xWorld"].SetValue(worldMatrix);
-
-            foreach (EffectPass pass in effect.CurrentTechnique.Passes)
-            {
-                pass.Apply();
-
-                GraphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vertices, 0, vertices.Length, indices, 0, indices.Length / 3, VertexPositionColor.VertexDeclaration);
-            }
-
-            RasterizerState es = new RasterizerState();
-            es.CullMode = CullMode.None;
-            es.FillMode = FillMode.Solid;
-            GraphicsDevice.RasterizerState = es;
-        }
 
         public void Draw(VertexBuffer vertices, IndexBuffer indices, int verticesLength, int indicesLength, Matrix worldMatrix)
         {
             RasterizerState rs = new RasterizerState();
             rs.CullMode = CullMode.None;
-            rs.FillMode = FillMode.WireFrame;
+            rs.FillMode = FillMode.Solid;
             GraphicsDevice.RasterizerState = rs;
 
-            effect.CurrentTechnique = effect.Techniques["ColoredNoShading"];
+            effect.CurrentTechnique = effect.Techniques["Colored"];
             effect.Parameters["xView"].SetValue(viewMatrix);
             effect.Parameters["xProjection"].SetValue(projectionMatrix);
             effect.Parameters["xWorld"].SetValue(worldMatrix);
+            effect.Parameters["xEnableLighting"].SetValue(true);
+            effect.Parameters["xLightDirection"].SetValue(lightDirection);
+            effect.Parameters["xAmbient"].SetValue(ambientValue);
 
             foreach (EffectPass pass in effect.CurrentTechnique.Passes)
             {

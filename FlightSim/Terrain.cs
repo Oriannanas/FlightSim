@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
@@ -16,37 +17,47 @@ namespace FlightSim
         int iterations;
         int width;
         int maxHeight;
-        VertexPositionColor[] verticeList;
+        VertexPositionNormalColored[] verticeList;
+        VertexPositionNormalColored[] verticeList2;
+        int verticesListLength;
+        int indicesListLength;
         float detail;
         VertexBuffer vertexBuffer;
         IndexBuffer indexBuffer;
 
-        public Terrain(Game1 game, Vector2 position, int width, int iterations, float detail)
+        public Terrain(Game1 game, Vector2 position, int width, int iterations, int terrainHeight, float detail)
         {
             this.game = game;
             this.position = position;
             this.width = width;
             this.iterations = iterations;
             this.detail = detail;
-            this.maxHeight = 128;
+            this.maxHeight = terrainHeight;
             SetUpVertices();
+            verticeList2 = verticeList;
+            maxHeight = 1;
+            SetUpVertices();
+
+            for(int i= 0; i < verticeList.Length; i++)
+            {
+                verticeList[i].Position.Y += 1;
+                verticeList[i].Position.Y *= verticeList2[i].Position.Y;
+            }
+
             SetUpIndices();
 
             CopyToBuffers();
+            GenerateNormals(vertexBuffer, indexBuffer);
         }
 
         private void SetUpVertices()
         {
-            verticeList = new VertexPositionColor[4];
+            verticeList = new VertexPositionNormalColored[4];
 
-            verticeList[0].Position = new Vector3(0f, (((float)rng.NextDouble() - 0.5f) * maxHeight/2), 0f);
-            verticeList[0].Color = Color.White;
-            verticeList[1].Position = new Vector3(width/2 + position.X*width, (((float)rng.NextDouble() - 0.5f) * maxHeight/2), 0f);
-            verticeList[1].Color = Color.White;
-            verticeList[2].Position = new Vector3(0f, (((float)rng.NextDouble() - 0.5f) * maxHeight/2), -width/2 - position.Y*width);
-            verticeList[2].Color = Color.White;
-            verticeList[3].Position = new Vector3(width/2 + position.X*width, (((float)rng.NextDouble() - 0.5f) * maxHeight/2), -width/2 - position.Y*width);
-            verticeList[3].Color = Color.White;
+            verticeList[0].Position = new Vector3(0f, (((float)rng.NextDouble() - 0.5f) * maxHeight), 0f);
+            verticeList[1].Position = new Vector3(width/2 + position.X*width, (((float)rng.NextDouble() - 0.5f) * maxHeight), 0f);
+            verticeList[2].Position = new Vector3(0f, (((float)rng.NextDouble() - 0.5f) * maxHeight), -width/2 - position.Y*width);
+            verticeList[3].Position = new Vector3(width/2 + position.X*width, (((float)rng.NextDouble() - 0.5f) * maxHeight), -width/2 - position.Y*width);
 
             //make a new array to save the vertices in
             //the new array should be (number of iterations+1)^2
@@ -55,7 +66,7 @@ namespace FlightSim
             float highestY = 0;
             for (int iter = 0; iter < iterations; iter++)
             {
-                VertexPositionColor[] tempList = new VertexPositionColor[(int)(Math.Pow(Math.Pow(2, iter + 1) + 1, 2))];
+                VertexPositionNormalColored[] tempList = new VertexPositionNormalColored[(int)(Math.Pow(Math.Pow(2, iter + 1) + 1, 2))];
 
                 int oldSquaresRow = (int)Math.Pow(2, iter);
                 int oldSquaresTotal = (int)Math.Pow(oldSquaresRow, 2);
@@ -178,12 +189,13 @@ namespace FlightSim
                 }
                 //now store the temporary list to the real list for the next iteration or actual use
                 verticeList = tempList;
-                for(int i = 0; i < verticeList.Length; i++)
-                {
-                    verticeList[i].Color = Color.White;
-                }
             }
-            Console.WriteLine(maxHeight +  " ... " +  lowestY + " & " + highestY);
+            for (int i = 0; i < verticeList.Length; i++)
+            {
+                verticeList[i].Position.Y += maxHeight / 2;
+                verticeList[i].Color = Color.Green;
+            }
+            GimmeDatImage(verticeList);
 
         }
         private void SetUpIndices()
@@ -199,23 +211,71 @@ namespace FlightSim
             {
                 for (int x = 0; x < squareRow; x++)
                 {
+                    indices[index++] = ((y+1) * verticeRow + (x+1));
+                    indices[index++] = (y * verticeRow + (x + 1));
                     indices[index++] = (y * verticeRow + x);
-                    indices[index++] = (y * verticeRow + x + 1);
-                    indices[index++] = ((y+1) * verticeRow + x);
 
-                    indices[index++] = (y * verticeRow + x+1);
-                    indices[index++] = ((y + 1) * verticeRow + x);
                     indices[index++] = ((y + 1) * verticeRow + x+1);
+                    indices[index++] = (y * verticeRow + x);
+                    indices[index++] = ((y + 1) * verticeRow + x);
                 }
             }
         }
+        private void GenerateNormals(VertexBuffer vb, IndexBuffer ib)
+        {
+            VertexPositionNormalColored[] vertices = new VertexPositionNormalColored[verticesListLength];
+            vb.GetData(vertices);
+            int[] indices = new int[indicesListLength];
+            ib.GetData(indices);
 
+            for (int i = 0; i < vertices.Length; i++)
+                vertices[i].Normal = new Vector3(0, 0, 0);
 
+            for (int i = 0; i < indices.Length / 3; i++)
+            {
+                Vector3 firstvec = vertices[indices[i * 3 + 1]].Position - vertices[indices[i * 3]].Position;
+                Vector3 secondvec = vertices[indices[i * 3]].Position - vertices[indices[i * 3 + 2]].Position;
+                Vector3 normal = Vector3.Cross(firstvec, secondvec);
+                normal.Normalize();
+                vertices[indices[i * 3]].Normal += normal;
+                vertices[indices[i * 3 + 1]].Normal += normal;
+                vertices[indices[i * 3 + 2]].Normal += normal;
+            }
+
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                vertices[i].Normal.Normalize();
+            }
+            vb.SetData(vertices);
+        }
+
+        public void GimmeDatImage(VertexPositionNormalColored[] vertices)
+        {
+            Texture2D newTexture = new Texture2D(game.GraphicsDevice, (int)(Math.Pow(2, iterations) + 1), (int)(Math.Pow(2, iterations) + 1));
+            Color[] colorData = new Color[vertices.Length];
+
+            for(int index = 0; index < vertices.Length; index++)
+            {
+                float thingy = (vertices[index].Position.Y + (maxHeight / 2))/maxHeight;
+                if(thingy < 0 || thingy > 1)
+                {
+                    //Console.WriteLine(thingy);
+                }
+                colorData[index] = new Color(thingy, thingy, thingy);
+            }
+            newTexture.SetData(colorData);
+            Stream stream = File.Create(DateTime.Now.ToString("MM-dd-yy H;mm;ss") + ".png");
+
+            //Save as PNG
+            newTexture.SaveAsPng(stream, newTexture.Width, newTexture.Height);
+            stream.Dispose();
+            newTexture.Dispose();
+        }
         public Vector3 AverageDiamond(Vector3 vec1, Vector3 vec2, Vector3 middlePoint, int iteration)
         {
             float newX = (vec1.X + vec2.X) / 2;
             float newY = ((vec1.Y + vec2.Y + middlePoint.Y) / 3);
-            newY += (((float)rng.NextDouble() - 0.5f - (0.5f * (newY / (maxHeight / 2)))) * maxHeight) / (float)Math.Pow(detail + 1, iteration);
+            newY += (((float)rng.NextDouble() - 0.5f) * maxHeight/2) / (float)Math.Pow(detail + 1, iteration);
             float newZ = (vec1.Z + vec2.Z) / 2;
             Vector3 newVector = new Vector3(newX, newY, newZ);
             return newVector;
@@ -224,38 +284,45 @@ namespace FlightSim
         {
             float newX = (vec1.X + vec2.X + vec3.X + vec4.X) / 4;
             float newY = ((vec1.Y + vec2.Y + vec3.Y + vec4.Y) / 4);
-            newY += (((float)rng.NextDouble() - 0.5f - (0.5f* (newY / (maxHeight / 2)))) * maxHeight) / (float)Math.Pow(detail + 1, iteration);
+            newY += (((float)rng.NextDouble() - 0.5f ) * maxHeight/2) / (float)Math.Pow(detail + 1, iteration);
             float newZ = (vec1.Z + vec2.Z + vec3.Z + vec4.Z) / 4;
             Vector3 newVector = new Vector3(newX, newY, newZ);
             return newVector;
         }
         private void CopyToBuffers()
         {
-            vertexBuffer = new VertexBuffer(game.GraphicsDevice, VertexPositionColor.VertexDeclaration, verticeList.Length, BufferUsage.WriteOnly);
+            verticesListLength = verticeList.Length;
+            vertexBuffer = new VertexBuffer(game.GraphicsDevice, typeof(VertexPositionNormalColored), verticesListLength, BufferUsage.None);
             vertexBuffer.SetData(verticeList);
+            verticeList = null;
 
-            indexBuffer = new IndexBuffer(game.GraphicsDevice, typeof(int), indices.Length, BufferUsage.WriteOnly);
+            indicesListLength = indices.Length;
+            indexBuffer = new IndexBuffer(game.GraphicsDevice, typeof(int), indices.Length, BufferUsage.None);
             indexBuffer.SetData(indices);
+            indices = null;
         }
 
         public void Draw(DrawHelper drawHelper)
         {
             Matrix worldMatrix = Matrix.Identity;
-            drawHelper.Draw(vertexBuffer, indexBuffer, verticeList.Length, indices.Length, worldMatrix);
+            drawHelper.Draw(vertexBuffer, indexBuffer, verticesListLength, indicesListLength, worldMatrix);
             //drawHelper.Draw(verticeList, indices, worldMatrix);
         }
     }
-    public struct VertexPositionColorNormal
+    public struct VertexPositionNormalColored : IVertexType
     {
         public Vector3 Position;
         public Color Color;
         public Vector3 Normal;
 
-        public readonly static VertexDeclaration VertexDeclaration = new VertexDeclaration
-        (
+        public readonly static VertexDeclaration VertexDeclaration = new VertexDeclaration(
             new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
-            new VertexElement(sizeof(float) * 3, VertexElementFormat.Color, VertexElementUsage.Color, 0),
-            new VertexElement(sizeof(float) * 3 + 4, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0)
-        );
+                  new VertexElement(sizeof(float) * 3, VertexElementFormat.Color, VertexElementUsage.Color, 0),
+                  new VertexElement(sizeof(float) * 4, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0));
+        
+        VertexDeclaration IVertexType.VertexDeclaration
+        {
+            get { return VertexPositionNormalColored.VertexDeclaration; }
+        }
     }
 }

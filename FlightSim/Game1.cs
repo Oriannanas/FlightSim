@@ -24,7 +24,7 @@ namespace FlightSim
 
         Effect effect;
 
-        Vector3 lightDirection = new Vector3(3, -2, 5);
+        Vector3 lightDirection = new Vector3(3, -5, 2);
 
         public Model targetModel { get; private set; }
 
@@ -109,7 +109,7 @@ namespace FlightSim
             targetModel = LoadModel("target");
 
             city = new City(this, sceneryTexture);
-            terrain = new Terrain(this, new Vector2(0,0), 1024,11, 0.85f);
+            terrain = new Terrain(this, new Vector2(0,0), 1024, 11, 256, 1f);
             xwing = new Plane(this, xwingModel, xwingTexture, bulletTexture);
             skyBox = new SkyBox(this, skyboxModel, skyboxTexture);
             
@@ -204,7 +204,7 @@ namespace FlightSim
             camup = Vector3.Transform(camup, Matrix.CreateFromQuaternion(cameraRotation));
 
             drawHelper.viewMatrix = Matrix.CreateLookAt(campos, xwing.position, camup);
-            drawHelper.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 0.2f, 500.0f);
+            drawHelper.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 0.2f, 1000);
 
             cameraPosition = campos;
             cameraUpDirection = camup;
