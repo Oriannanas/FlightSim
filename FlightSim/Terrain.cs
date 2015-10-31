@@ -39,9 +39,8 @@ namespace FlightSim
             {
                 verticeList[i].Position.Y *= (float)Math.Pow(verticeList[i].Position.Y, mountainy);
                 verticeList[i].Position.Y /= (float)Math.Pow(maxHeight, mountainy);
-                if (verticeList[i].Position.Y < 0)
-                    Console.WriteLine(verticeList[i].Position.Y);
             }
+            //GimmeDatImage(verticeList);
 
             SetUpIndices();
 
@@ -192,9 +191,7 @@ namespace FlightSim
             for (int i = 0; i < verticeList.Length; i++)
             {
                 verticeList[i].Position.Y += maxHeight / 2;
-                verticeList[i].Color = Color.Green;
             }
-            //GimmeDatImage(verticeList);
 
         }
         private void SetUpIndices()
@@ -244,6 +241,24 @@ namespace FlightSim
             for (int i = 0; i < vertices.Length; i++)
             {
                 vertices[i].Normal.Normalize();
+            }
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                if (vertices[i].Position.Y < maxHeight / 2)
+                {
+                    if (vertices[i].Normal.Y > 0.8f)
+                    {
+                        vertices[i].Color = Color.Green;
+                    }
+                    else
+                    {
+                        vertices[i].Color = Color.Gray;
+                    }
+                }
+                else
+                {
+                    vertices[i].Color = Color.White;
+                }
             }
             vb.SetData(vertices);
         }
