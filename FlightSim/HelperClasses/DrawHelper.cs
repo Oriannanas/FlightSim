@@ -142,7 +142,7 @@ namespace FlightSim
         {
             RasterizerState rs = new RasterizerState();
             rs.CullMode = CullMode.None;
-            rs.FillMode = FillMode.Solid;
+            rs.FillMode = FillMode.WireFrame;
             GraphicsDevice.RasterizerState = rs;
 
             effect.CurrentTechnique = effect.Techniques["Colored"];

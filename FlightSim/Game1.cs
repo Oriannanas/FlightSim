@@ -109,7 +109,7 @@ namespace FlightSim
             targetModel = LoadModel("target");
 
             city = new City(this, sceneryTexture);
-            terrain = new Terrain(this, new Vector2(0,0), 4096, 1024, 11, 7, 0.65f);
+            terrain = new Terrain(this, new Vector2(0,0), 1024, 100, 5, 3, 0.85f);
             xwing = new Plane(this, xwingModel, xwingTexture, bulletTexture);
             skyBox = new SkyBox(this, skyboxModel, skyboxTexture);
             
@@ -174,13 +174,12 @@ namespace FlightSim
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            UpdateCamera();
 
             xwing.Update(gameTime);
 
             BoundingSphere xwingSpere = new BoundingSphere(xwing.position, 0.04f);
 
-            
+
 
             /*if (CheckCollision(xwingSpere) != CollisionType.None)
             {
@@ -189,6 +188,7 @@ namespace FlightSim
             }*/
             // TODO: Add your update logic here
 
+            UpdateCamera();
             base.Update(gameTime);
         }
 
