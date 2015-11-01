@@ -47,7 +47,7 @@ namespace FlightSim
                 verticeList[i].Position.Y *= (float)Math.Pow(verticeList[i].Position.Y, mountainy);
                 verticeList[i].Position.Y /= (float)Math.Pow((maxHeight/2), mountainy);
             }*/
-            //GimmeDatImage(verticeList);
+            GimmeDatImage(verticeList);
 
             SetUpIndices();
 
@@ -235,19 +235,20 @@ namespace FlightSim
 
         private void SetUpVerticesBetter()
         {
-            verticeList = new VertexPositionNormalColored[(int)(Math.Pow(Math.Pow(2, iterations + 1) + 1, 2))];
-
             int squaresRow = (int)Math.Pow(2, iterations);
             int squaresTotal = (int)Math.Pow(squaresRow, 2);
-            int verticeRow = (int)(Math.Pow(2, iterations) + 1);
+            int verticeRow = (int)(Math.Pow(2, iterations + 1) + 1);
             int verticeTotal = (int)Math.Pow(verticeRow, 2);
+            verticeList = new VertexPositionNormalColored[verticeTotal];
+            Console.WriteLine((float)width / verticeRow);
+            
 
-            for (int x = 0; x < verticeRow; x++)
+            for (int z = 0; z < verticeRow; z++)
             {
-                for (int z = 0; z < verticeRow; z++)
+                for (int x = 0; x < verticeRow; x++)
                 {
                     int index = z * verticeRow + x;
-                    verticeList[index].Position = new Vector3((x*(float)width / verticeRow), 0, -z*((float)width / verticeRow));
+                    verticeList[index].Position = new Vector3(x*((float)width / (verticeRow-1)), 0, -z*((float)width / (verticeRow - 1)));
                     verticeList[index].Color = Color.Gray;
                 }
             }
@@ -257,7 +258,7 @@ namespace FlightSim
             verticeList[verticeRow * (verticeRow - 1)].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
             verticeList[verticeRow * verticeRow - 1].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
 
-            for (int iter = 1; iter <= iterations; iter++)
+            for (int iter = 0; iter < iterations; iter++)
             {
                 int iterSquaresRow = (int)Math.Pow(2, iter);
                 int verticesPerSquare = ((verticeRow-1) / iterSquaresRow);
@@ -329,7 +330,7 @@ namespace FlightSim
                                                                                       iter);
 
                         }
-                        if (z == -(iterSquaresRow - 1))
+                        if (z == (iterSquaresRow - 1))
                         {
                             verticeList[bottomMiddlePoint].Position.Y = AverageFloat(verticeList[leftBottomPoint].Position.Y,
                                                                                        verticeList[rightBottomPoint].Position.Y,
@@ -348,6 +349,14 @@ namespace FlightSim
                 }
             }
 
+            for (int i = 0; i < verticeList.Length; i++)
+            {
+                if(verticeList[i].Position.Y == 0)
+                {
+                    //Console.WriteLine(i);
+                }
+            }
+            Console.WriteLine(verticeList.Length);
 
         }
 
@@ -355,7 +364,8 @@ namespace FlightSim
         {
             int amountOfIndices = (int)Math.Pow(4, iterations) * 6;
             int squareRow = (int)Math.Pow(2, iterations );
-            int verticeRow = (int)(Math.Pow(2, iterations ) + 1);
+            int verticeRow = (int)(Math.Pow(2, iterations +1) + 1);
+            Console.WriteLine(squareRow + "   "+ verticeRow);
 
             indiceList = new int[amountOfIndices];
 
@@ -481,7 +491,7 @@ namespace FlightSim
             newY += (((float)rng.NextDouble() - 0.5f) * maxHeight);
             while (newY < -maxHeight / 2 || newY > maxHeight / 2)
             {
-                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight);
+                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(detail + 1, iteration);
             }
             return newY;
         }
@@ -492,7 +502,7 @@ namespace FlightSim
             newY += (((float)rng.NextDouble() - 0.5f) * maxHeight);
             while (newY < -maxHeight / 2 || newY > maxHeight / 2)
             {
-                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight);
+                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(detail + 1, iteration);
             }
             return newY;
         }
