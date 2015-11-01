@@ -33,6 +33,7 @@ namespace FlightSim
 
         Plane xwing;
         City city;
+        TerrainGrid terrainGrid;
         Terrain terrain;
         SkyBox skyBox;
         public List<Target> targetList { get; set; } = new List<Target>();
@@ -109,7 +110,13 @@ namespace FlightSim
             targetModel = LoadModel("target");
 
             city = new City(this, sceneryTexture);
-            terrain = new Terrain(this, new Vector2(0,0), 4096, 1024, 10, 3, 0.95f);
+            terrainGrid = new TerrainGrid(this, 10, 4096);
+            //terrainGrid.LoadTerrain(-1, -1);
+            terrainGrid.LoadTerrain(0, -1);
+            terrainGrid.LoadTerrain(1, -1);
+            terrainGrid.LoadTerrain(-1, 0);
+            terrainGrid.LoadTerrain(0, 0);
+            terrainGrid.LoadTerrain(1, 0);
             xwing = new Plane(this, xwingModel, xwingTexture, bulletTexture);
             skyBox = new SkyBox(this, skyboxModel, skyboxTexture);
             
@@ -204,7 +211,7 @@ namespace FlightSim
             camup = Vector3.Transform(camup, Matrix.CreateFromQuaternion(cameraRotation));
 
             drawHelper.viewMatrix = Matrix.CreateLookAt(campos, xwing.position, camup);
-            drawHelper.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 0.2f, 4000);
+            drawHelper.projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, GraphicsDevice.Viewport.AspectRatio, 0.2f, 8000);
 
             cameraPosition = campos;
             cameraUpDirection = camup;
@@ -252,7 +259,7 @@ namespace FlightSim
             {
                 target.Draw(drawHelper);
             }
-            terrain.Draw(drawHelper);
+            terrainGrid.Draw(drawHelper);
             base.Draw(gameTime);
         }
         

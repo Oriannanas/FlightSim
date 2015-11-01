@@ -10,125 +10,213 @@ namespace FlightSim
 {
     public class Terrain
     {
+        public int index;
+        Game1 game;
+        TerrainGrid grid;
+
         Vector2 position;
         Random rng = new Random();
-        Game1 game;
         VertexPositionNormalColored[] verticeList;
-        VertexPositionColor[] waterVerticeList;
+        public float[] leftEdge
+        {
+            get; private set;
+        }
+        public float[] rightEdge
+        {
+            get; private set;
+        }
+        public float[] bottomEdge
+        {
+            get; private set;
+        }
+        public float[] topEdge
+        {
+            get; private set;
+        }
         int[] indiceList;
-        int[] waterIndiceList;
         int iterations;
         int width;
         int maxHeight;
         int verticeListLength;
-        int waterVerticeListLength;
         int indiceListLength;
-        int waterIndiceListLength;
         float roughness;
         VertexBuffer vertexBuffer;
         IndexBuffer indexBuffer;
-        VertexBuffer waterVertexBuffer;
-        IndexBuffer waterIndexBuffer;
-
-        public Terrain(Game1 game, Vector2 position, int width, int terrainHeight, int iterations, float mountainy, float roughness)
+        public Terrain(int index, Game1 game, TerrainGrid grid, Vector2 position, int width, int terrainHeight, int iterations, float mountainy, float roughness)
         {
+            this.index = index;
             this.game = game;
+            this.grid = grid;
             this.position = position;
             this.width = width;
             this.iterations = iterations;
             this.roughness = roughness;
             this.maxHeight = terrainHeight;
             SetUpVerticesBetter();
-            GenerateWater();
-
-
-            for (int i = 0; i < verticeList.Length; i++)
-            {
-                verticeList[i].Position.Y *= (float)Math.Pow(verticeList[i].Position.Y, mountainy);
-                verticeList[i].Position.Y /= (float)Math.Pow((maxHeight/2), mountainy);
-            }
+            
             //GimmeDatImage(verticeList);
 
             SetUpIndices();
 
             CopyToBuffers();
             GenerateNormals(vertexBuffer, indexBuffer);
-            GenerateWater();
         }
 
-        private void GenerateWater()
-        {
-            waterVerticeList = new VertexPositionColor[4];
-
-            waterVerticeList[0].Position = new Vector3(0f, -10f, 0f);
-            waterVerticeList[0].Color = Color.Blue;
-            waterVerticeList[1].Position = new Vector3(width, -10f, 0f);
-            waterVerticeList[1].Color = Color.Blue;
-            waterVerticeList[2].Position = new Vector3(0f, -10f, -width);
-            waterVerticeList[2].Color = Color.Blue;
-            waterVerticeList[3].Position = new Vector3(width, -10f, -width);
-            waterVerticeList[3].Color = Color.Blue;
-
-            waterIndiceList = new int[6];
-
-            waterIndiceList[0] = 0;
-            waterIndiceList[1] = 1;
-            waterIndiceList[2] = 2;
-            
-            waterIndiceList[3] = 1;
-            waterIndiceList[4] = 2;
-            waterIndiceList[5] = 3;
-
-            waterVerticeListLength = waterVerticeList.Length;
-            waterVertexBuffer = new VertexBuffer(game.GraphicsDevice, typeof(VertexPositionNormalColored), waterVerticeList.Length, BufferUsage.None);
-            waterVertexBuffer.SetData(waterVerticeList);
-            waterVerticeList = null;
-
-            waterIndiceListLength = waterIndiceList.Length;
-            waterIndexBuffer = new IndexBuffer(game.GraphicsDevice, typeof(int), waterIndiceList.Length, BufferUsage.None);
-            waterIndexBuffer.SetData(waterIndiceList);
-            waterIndiceList = null;
-            
-        }
         private void SetUpVerticesBetter()
         {
             int squaresRow = (int)Math.Pow(2, iterations);
             int squaresTotal = (int)Math.Pow(squaresRow, 2);
-            int verticeRow = (int)(Math.Pow(2, iterations + 1) + 1);
+            int verticeRow = (int)(Math.Pow(2, iterations) + 1);
             int verticeTotal = (int)Math.Pow(verticeRow, 2);
-            verticeList = new VertexPositionNormalColored[verticeTotal];
             
+
+            verticeList = new VertexPositionNormalColored[verticeTotal];
+
+            bool leftLoaded = false;
+            bool rightLoaded = false;
+            bool topLoaded = false;
+            bool bottomLoaded = false; 
+
+            if (grid.CheckTerrain(index, -1, 0) != short.MinValue)
+            {
+                Console.WriteLine("Left");
+                leftEdge = grid.GetTerrainEdge(grid.CheckTerrain(index, -1, 0), 1, 0);
+                leftLoaded = true;
+            }
+            else
+            {
+                leftEdge = new float[verticeRow];
+            }
+            if (grid.CheckTerrain(index, 1, 0) != short.MinValue)
+            {
+                Console.WriteLine("right");
+                rightEdge = grid.GetTerrainEdge(grid.CheckTerrain(index, 1, 0), -1, 0);
+                rightLoaded = true;
+            }
+            else
+            {
+                rightEdge = new float[verticeRow];
+            }
+            if (grid.CheckTerrain(index, 0, -1) != short.MinValue)
+            {
+                Console.WriteLine("top");
+                topEdge = grid.GetTerrainEdge(grid.CheckTerrain(index, 0, -1), 0, 1);
+                topLoaded = true;
+            }
+            else
+            {
+                topEdge = new float[verticeRow];
+            }
+            if (grid.CheckTerrain(index, 0, 1) != short.MinValue)
+            {
+                Console.WriteLine("bottom");
+                bottomEdge = grid.GetTerrainEdge(grid.CheckTerrain(index, 0, 1), 0, -1);
+                bottomLoaded = true;
+            }
+            else
+            {
+                bottomEdge = new float[verticeRow];
+            }
+
 
             for (int z = 0; z < verticeRow; z++)
             {
                 for (int x = 0; x < verticeRow; x++)
                 {
                     int index = z * verticeRow + x;
-                    verticeList[index].Position = new Vector3(x*((float)width / (verticeRow-1)), 0, -z*((float)width / (verticeRow - 1)));
-                    verticeList[index].Color = Color.Gray;
+                    verticeList[index].Position = new Vector3(x * ((float)width / (verticeRow - 1)), 0, -z * ((float)width / (verticeRow - 1)));
+                    if (x == 0 && leftLoaded)
+                    {
+                        verticeList[index].Position.Y = leftEdge[z];
+                    }
+                    if (x == verticeRow - 1 && rightLoaded)
+                    {
+
+                        verticeList[index].Position.Y = rightEdge[z];
+                    }
+                    if (z == 0 && bottomLoaded)
+                    {
+                        verticeList[index].Position.Y = bottomEdge[x];
+                    }
+                    if (z == verticeRow - 1 && topLoaded)
+                    {
+
+                        verticeList[index].Position.Y = topEdge[x];
+                    }
                 }
             }
-            
+            /*if (!topLoaded && !leftLoaded)
+            {
+                verticeList[0].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
+                topEdge[0] = verticeList[0].Position.Y;
+                leftEdge[verticeRow - 1] = verticeList[0].Position.Y;
+            }
+            else if(topLoaded)
+            {
+                verticeList[0].Position.Y = topEdge[0];
+            }
+            else
+            {
+                verticeList[0].Position.Y =leftEdge[verticeRow - 1];
+            }
 
-            verticeList[0].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
-            verticeList[verticeRow - 1].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
-            verticeList[verticeRow * (verticeRow - 1)].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
-            verticeList[verticeRow * verticeRow - 1].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
+            if (!topLoaded &&  !rightLoaded) {
+                verticeList[verticeRow - 1].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
+                topEdge[verticeRow - 1] = verticeList[verticeRow - 1].Position.Y;
+                rightEdge[0] = verticeList[verticeRow - 1].Position.Y;
+            }
+            else if (topLoaded)
+            {
+                verticeList[verticeRow - 1].Position.Y = topEdge[verticeRow - 1];
+            }
+            else
+            {
+                verticeList[verticeRow - 1].Position.Y = rightEdge[0];
+            }
 
-            for (int iter = 0; iter < iterations+1; iter++)
+            if (!bottomLoaded && !leftLoaded) {
+                verticeList[verticeRow * (verticeRow - 1)].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
+                bottomEdge[0] = verticeList[verticeRow * (verticeRow - 1)].Position.Y;
+                leftEdge[0] = verticeList[verticeRow * (verticeRow - 1)].Position.Y;
+            }
+            else if (bottomLoaded)
+            {
+                verticeList[verticeRow * (verticeRow - 1)].Position.Y = bottomEdge[0];
+            }
+            else
+            {
+                verticeList[verticeRow * (verticeRow - 1)].Position.Y = leftEdge[0];
+            }
+
+            if (!bottomLoaded && !rightLoaded)
+            {
+                verticeList[verticeRow * verticeRow - 1].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
+                bottomEdge[verticeRow - 1] = verticeList[verticeRow * verticeRow - 1].Position.Y;
+                rightEdge[verticeRow - 1] = verticeList[verticeRow * verticeRow - 1].Position.Y;
+            }
+            else if (bottomLoaded)
+            {
+                verticeList[verticeRow * verticeRow - 1].Position.Y = bottomEdge[verticeRow - 1];
+            }
+            else
+            {
+                verticeList[verticeRow * verticeRow - 1].Position.Y = rightEdge[verticeRow - 1];
+            }*/
+
+            for (int iter = 1; iter <= iterations; iter++)
             {
                 int iterSquaresRow = (int)Math.Pow(2, iter);
-                int verticesPerSquare = ((verticeRow-1) / iterSquaresRow);
+                int verticesPerSquare = ((verticeRow - 1) / iterSquaresRow);
                 for (int x = 0; x < iterSquaresRow; x++)
                 {
                     for (int z = 0; z < iterSquaresRow; z++)
                     {
                         int leftTopPoint = z * verticeRow * verticesPerSquare + x * verticesPerSquare;
                         int rightTopPoint = z * verticesPerSquare * verticeRow + x * verticesPerSquare + verticesPerSquare;
-                        int middlePoint = (z* verticesPerSquare + verticesPerSquare / 2)*verticeRow +  x*verticesPerSquare + verticesPerSquare/2;
+                        int middlePoint = (z * verticesPerSquare + verticesPerSquare / 2) * verticeRow + x * verticesPerSquare + verticesPerSquare / 2;
                         int leftBottomPoint = (z * verticesPerSquare + verticesPerSquare) * verticeRow + x * verticesPerSquare;
                         int rightBottomPoint = (z * verticesPerSquare + verticesPerSquare) * verticeRow + x * verticesPerSquare + verticesPerSquare;
-                        
+
 
                         verticeList[middlePoint].Position.Y = AverageFloat(verticeList[leftTopPoint].Position.Y,
                                                                             verticeList[rightTopPoint].Position.Y,
@@ -137,8 +225,6 @@ namespace FlightSim
                                                                                       iter);
                     }
                 }
-
-                //Console.WriteLine("waar loopt ie vast" + iter);
                 for (int x = 0; x < iterSquaresRow; x++)
                 {
                     for (int z = 0; z < iterSquaresRow; z++)
@@ -153,28 +239,52 @@ namespace FlightSim
                         int bottomMiddlePoint = (z * verticesPerSquare + verticesPerSquare) * verticeRow + x * verticesPerSquare + verticesPerSquare / 2;
                         int rightBottomPoint = (z * verticesPerSquare + verticesPerSquare) * verticeRow + x * verticesPerSquare + verticesPerSquare;
 
-                        if (z == 0)
-                        {
-                            verticeList[topMiddlePoint].Position.Y = AverageFloat(verticeList[leftTopPoint].Position.Y,
-                                                                                     verticeList[rightTopPoint].Position.Y,
-                                                                                     verticeList[middlePoint].Position.Y,
-                                                                                      iter);
-                        }
-
                         if (x == 0)
                         {
-                            verticeList[leftMiddlePoint].Position.Y = AverageFloat(verticeList[leftTopPoint].Position.Y,
-                                                                                     verticeList[leftBottomPoint].Position.Y,
-                                                                                     verticeList[middlePoint].Position.Y,
-                                                                                      iter);
+                            if (!leftLoaded)
+                            {
+                                verticeList[leftMiddlePoint].Position.Y = AverageFloat(verticeList[leftTopPoint].Position.Y,
+                                                                                         verticeList[leftBottomPoint].Position.Y,
+                                                                                         verticeList[middlePoint].Position.Y,
+                                                                                          iter);
+                                leftEdge[z * verticesPerSquare + verticesPerSquare / 2] = verticeList[leftMiddlePoint].Position.Y;
+                            }
+                            else
+                            {
+                                verticeList[leftMiddlePoint].Position.Y = leftEdge[z * verticesPerSquare + verticesPerSquare / 2];
+                            }
                         }
+                        if (z == 0)
+                        {
+                            if (!topLoaded)
+                            {
+                                verticeList[topMiddlePoint].Position.Y = AverageFloat(verticeList[leftTopPoint].Position.Y,
+                                                                                         verticeList[rightTopPoint].Position.Y,
+                                                                                         verticeList[middlePoint].Position.Y,
+                                                                                          iter);
+                                topEdge[x * verticesPerSquare + verticesPerSquare / 2] = verticeList[topMiddlePoint].Position.Y;
+                            }
+                            else
+                            {
+                                verticeList[topMiddlePoint].Position.Y = topEdge[x * verticesPerSquare + verticesPerSquare / 2];
+                            }
+                        }
+
 
                         if (x == iterSquaresRow - 1)
                         {
-                            verticeList[rightMiddlePoint].Position.Y = AverageFloat(verticeList[rightTopPoint].Position.Y,
-                                                                                      verticeList[rightBottomPoint].Position.Y,
-                                                                                      verticeList[middlePoint].Position.Y,
-                                                                                      iter);
+                            if (!rightLoaded)
+                            {
+                                verticeList[rightMiddlePoint].Position.Y = AverageFloat(verticeList[rightTopPoint].Position.Y,
+                                                                                          verticeList[rightBottomPoint].Position.Y,
+                                                                                          verticeList[middlePoint].Position.Y,
+                                                                                          iter);
+                                rightEdge[z * verticesPerSquare + verticesPerSquare / 2] = verticeList[rightMiddlePoint].Position.Y;
+                            }
+                            else
+                            {
+                                verticeList[rightMiddlePoint].Position.Y = rightEdge[z * verticesPerSquare + verticesPerSquare / 2];
+                            }
                         }
                         else
                         {
@@ -187,29 +297,36 @@ namespace FlightSim
                         }
                         if (z == (iterSquaresRow - 1))
                         {
-                            verticeList[bottomMiddlePoint].Position.Y = AverageFloat(verticeList[leftBottomPoint].Position.Y,
-                                                                                       verticeList[rightBottomPoint].Position.Y,
-                                                                                       verticeList[middlePoint].Position.Y,
-                                                                                      iter);
+                            if (!bottomLoaded)
+                            {
+                                verticeList[bottomMiddlePoint].Position.Y = AverageFloat(verticeList[leftBottomPoint].Position.Y,
+                                                                                           verticeList[rightBottomPoint].Position.Y,
+                                                                                           verticeList[middlePoint].Position.Y,
+                                                                                          iter);
+                                bottomEdge[x * verticesPerSquare + verticesPerSquare / 2] = verticeList[bottomMiddlePoint].Position.Y;
+                            }
+                            else
+                            {
+                                verticeList[bottomMiddlePoint].Position.Y = bottomEdge[x * verticesPerSquare + verticesPerSquare / 2];
+
+                            }
                         }
                         else
                         {
                             verticeList[bottomMiddlePoint].Position.Y = AverageFloat(verticeList[leftBottomPoint].Position.Y,
                                                                                       verticeList[rightBottomPoint].Position.Y,
                                                                                       verticeList[middlePoint].Position.Y,
-                                                                                      verticeList[bottomMiddlePoint + (verticesPerSquare / 2)*verticeRow].Position.Y,
+                                                                                      verticeList[bottomMiddlePoint + (verticesPerSquare / 2) * verticeRow].Position.Y,
                                                                                       iter);
                         }
                     }
                 }
-
-                //Console.WriteLine("waar loopt ie vast, hiervoor?" + iter);
             }
             float highestY = 0;
             float lowestY = 0;
             for (int i = 0; i < verticeList.Length; i++)
             {
-                if(verticeList[i].Position.Y < lowestY)
+                if (verticeList[i].Position.Y < lowestY)
                 {
                     lowestY = verticeList[i].Position.Y;
                 }
@@ -219,28 +336,28 @@ namespace FlightSim
                     highestY = verticeList[i].Position.Y;
                 }
             }
-            Console.WriteLine(lowestY + " & " + highestY);
+
 
         }
 
         private void SetUpIndices()
         {
             int amountOfIndices = (int)Math.Pow(4, iterations) * 6;
-            int squareRow = (int)Math.Pow(2, iterations );
-            int verticeRow = (int)(Math.Pow(2, iterations +1) + 1);
+            int squareRow = (int)Math.Pow(2, iterations);
+            int verticeRow = (int)(Math.Pow(2, iterations) + 1);
 
             indiceList = new int[amountOfIndices];
-
+            
             int index = 0;
             for (int y = 0; y < squareRow; y++)
             {
                 for (int x = 0; x < squareRow; x++)
                 {
-                    indiceList[index++] = ((y+1) * verticeRow + (x+1));
+                    indiceList[index++] = ((y + 1) * verticeRow + (x + 1));
                     indiceList[index++] = (y * verticeRow + (x + 1));
                     indiceList[index++] = (y * verticeRow + x);
 
-                    indiceList[index++] = ((y + 1) * verticeRow + x+1);
+                    indiceList[index++] = ((y + 1) * verticeRow + x + 1);
                     indiceList[index++] = (y * verticeRow + x);
                     indiceList[index++] = ((y + 1) * verticeRow + x);
                 }
@@ -273,7 +390,7 @@ namespace FlightSim
             }
             for (int i = 0; i < vertices.Length; i++)
             {
-                if (vertices[i].Position.Y < maxHeight / 2)
+                if (vertices[i].Position.Y < maxHeight *0.75f)
                 {
                     if (vertices[i].Normal.Y > 0.8f)
                     {
@@ -304,10 +421,10 @@ namespace FlightSim
             Texture2D newTexture = new Texture2D(game.GraphicsDevice, (int)(Math.Sqrt(vertices.Length)), (int)(Math.Sqrt(vertices.Length)));
             Color[] colorData = new Color[vertices.Length];
 
-            for(int index = 0; index < vertices.Length; index++)
+            for (int index = 0; index < vertices.Length; index++)
             {
-                float thingy = (vertices[index].Position.Y + (maxHeight / 2))/maxHeight;
-                if(thingy < 0 || thingy > 1)
+                float thingy = (vertices[index].Position.Y + (maxHeight / 2)) / maxHeight;
+                if (thingy < 0 || thingy > 1)
                 {
                     //Console.WriteLine(thingy);
                 }
@@ -385,9 +502,8 @@ namespace FlightSim
 
         public void Draw(DrawHelper drawHelper)
         {
-            Matrix worldMatrix = Matrix.Identity;
+            Matrix worldMatrix = Matrix.Identity * Matrix.CreateTranslation(new Vector3((width) * position.X, 0, -(width) * position.Y));
             drawHelper.Draw(vertexBuffer, indexBuffer, verticeListLength, indiceListLength, worldMatrix);
-            drawHelper.Draw(waterVertexBuffer, waterIndexBuffer, waterVerticeListLength, waterIndiceListLength, worldMatrix);
             //drawHelper.Draw(verticeList, indices, worldMatrix);
         }
     }
@@ -401,7 +517,7 @@ namespace FlightSim
             new VertexElement(0, VertexElementFormat.Vector3, VertexElementUsage.Position, 0),
                   new VertexElement(sizeof(float) * 3, VertexElementFormat.Color, VertexElementUsage.Color, 0),
                   new VertexElement(sizeof(float) * 4, VertexElementFormat.Vector3, VertexElementUsage.Normal, 0));
-        
+
         VertexDeclaration IVertexType.VertexDeclaration
         {
             get { return VertexPositionNormalColored.VertexDeclaration; }

@@ -43,14 +43,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="FlightSim.exe" size="183200">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="FlightSim.exe" size="184736">
       <assemblyIdentity name="FlightSim" version="3.4.0.456" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>usfgTeukRBi9bs/HQs8RrzGMR9E=</dsig:DigestValue>
+        <dsig:DigestValue>jJFoS4Jps1ZrXSYiTCM119JFeXw=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

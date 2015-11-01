@@ -17,7 +17,7 @@ namespace FlightSim
         Texture2D bulletTexture;
 
         double lastBulletTime = 0;
-        public Vector3 position{ get; private set; } = new Vector3(8, 128, -3);
+        public Vector3 position{ get; private set; } = new Vector3(0, 128, 0);
 
         public float moveSpeed { get; private set; }
         // Up and down rotational variables
