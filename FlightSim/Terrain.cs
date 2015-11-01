@@ -24,7 +24,7 @@ namespace FlightSim
         int waterVerticeListLength;
         int indiceListLength;
         int waterIndiceListLength;
-        float detail;
+        float roughness;
         VertexBuffer vertexBuffer;
         IndexBuffer indexBuffer;
         VertexBuffer waterVertexBuffer;
@@ -36,18 +36,18 @@ namespace FlightSim
             this.position = position;
             this.width = width;
             this.iterations = iterations;
-            this.detail = roughness;
+            this.roughness = roughness;
             this.maxHeight = terrainHeight;
             SetUpVerticesBetter();
             GenerateWater();
 
 
-           /* for (int i = 0; i < verticeList.Length; i++)
+            for (int i = 0; i < verticeList.Length; i++)
             {
                 verticeList[i].Position.Y *= (float)Math.Pow(verticeList[i].Position.Y, mountainy);
                 verticeList[i].Position.Y /= (float)Math.Pow((maxHeight/2), mountainy);
-            }*/
-            GimmeDatImage(verticeList);
+            }
+            //GimmeDatImage(verticeList);
 
             SetUpIndices();
 
@@ -80,7 +80,7 @@ namespace FlightSim
             waterIndiceList[5] = 3;
 
             waterVerticeListLength = waterVerticeList.Length;
-            waterVertexBuffer = new VertexBuffer(game.GraphicsDevice, typeof(VertexPositionNormalColored), waterVerticeListLength, BufferUsage.None);
+            waterVertexBuffer = new VertexBuffer(game.GraphicsDevice, typeof(VertexPositionNormalColored), waterVerticeList.Length, BufferUsage.None);
             waterVertexBuffer.SetData(waterVerticeList);
             waterVerticeList = null;
 
@@ -90,149 +90,6 @@ namespace FlightSim
             waterIndiceList = null;
             
         }
-        /*private void SetUpVertices()
-        {
-            verticeList = new VertexPositionNormalColored[4];
-
-            verticeList[0].Position = new Vector3(0f, (((float)rng.NextDouble() - 0.5f) * maxHeight), 0f);
-            verticeList[1].Position = new Vector3(width/2 + position.X*width, (((float)rng.NextDouble() - 0.5f) * maxHeight), 0f);
-            verticeList[2].Position = new Vector3(0f, (((float)rng.NextDouble() - 0.5f) * maxHeight), -width/2 - position.Y*width);
-            verticeList[3].Position = new Vector3(width/2 + position.X*width, (((float)rng.NextDouble() - 0.5f) * maxHeight), -width/2 - position.Y*width);
-
-            //make a new array to save the vertices in
-            //the new array should be (number of iterations+1)^2
-            //iter stands for iteration
-            float lowestY = 0;
-            float highestY = 0;
-            for (int iter = 0; iter < iterations; iter++)
-            {
-                VertexPositionNormalColored[] tempList = new VertexPositionNormalColored[(int)(Math.Pow(Math.Pow(2, iter + 1) + 1, 2))];
-
-                int oldSquaresRow = (int)Math.Pow(2, iter);
-                int oldSquaresTotal = (int)Math.Pow(oldSquaresRow, 2);
-                int oldVerticeRow = (int)(Math.Pow(2, iter) + 1);
-                int oldVerticeTotal = (int)Math.Pow(oldVerticeRow, 2);
-                int newVerticeRow = (int)(Math.Pow(2, iter + 1) + 1);
-                int newVerticeTotal = (int)Math.Pow(newVerticeRow, 2);
-
-                //iterate through every square in the current(old) grid
-                for (int y = 0; y < oldSquaresRow; y++)
-                {
-                    for (int x = 0; x < oldSquaresRow; x++)
-                    {
-                        //define the index of the several points in the new grid of vertices
-                        int topLeftPointIndex = (y * 2) * newVerticeRow + x * 2;
-                        int topRightPointIndex = (y * 2) * newVerticeRow + x * 2 + 2;
-                        int bottomRightPointIndex = (y * 2 + 2) * newVerticeRow + x * 2 + 2;
-                        int bottomLeftPointIndex = (y * 2 + 2) * newVerticeRow + x * 2;
-
-                        int middlePointIndex = (y * 2 + 1) * newVerticeRow + x * 2 + 1;
-
-
-                        //transfer the square's vertices to the new array
-                        tempList[bottomRightPointIndex].Position = verticeList[((y + 1) * oldVerticeRow) + (x) + 1].Position;
-
-                        if (tempList[topLeftPointIndex].Position.Y < lowestY)
-                        {
-                            lowestY = tempList[topLeftPointIndex].Position.Y;
-                        }
-                        if (tempList[topLeftPointIndex].Position.Y > highestY)
-                        {
-                            highestY = tempList[topLeftPointIndex].Position.Y;
-                        }
-                        if (y == 0)
-                        {
-                            tempList[topLeftPointIndex].Position = verticeList[(y * oldVerticeRow) + x].Position;
-                            tempList[topRightPointIndex].Position = verticeList[(y * oldVerticeRow) + x + 1].Position;
-                        }
-                        //only calculate the middle point of the left when this square is at the left of the grid
-                        if (x == 0)
-                        {
-                            tempList[bottomLeftPointIndex].Position = verticeList[((y + 1) * oldVerticeRow) + (x)].Position;
-                        }
-
-                        //define the new middle point vertice as the average of the 4 corners of the old square
-                        tempList[middlePointIndex].Position = AverageSquare(tempList[topLeftPointIndex].Position,
-                                                                            tempList[topRightPointIndex].Position,
-                                                                            tempList[bottomLeftPointIndex].Position,
-                                                                            tempList[bottomRightPointIndex].Position,
-                                                                                      iter);
-
-
-                        //only calculate the middle point of the top when this square is at the top of the grid
-                    }
-                }
-                for (int y = 0; y < oldSquaresRow; y++)
-                {
-                    for (int x = 0; x < oldSquaresRow; x++)
-                    {
-                        int middlePointIndex = (y * 2 + 1) * newVerticeRow + x * 2 + 1;
-                        int topLeftPointIndex = (y * 2) * newVerticeRow + x * 2;
-                        int topRightPointIndex = (y * 2) * newVerticeRow + x * 2 + 2;
-                        int bottomRightPointIndex = (y * 2 + 2) * newVerticeRow + x * 2 + 2;
-                        int bottomLeftPointIndex = (y * 2 + 2) * newVerticeRow + x * 2;
-
-                        //always calculate the diamond middle point of the right and bottom side of the square
-                        int rightMiddlePointIndex = (y * 2 + 1) * newVerticeRow + x * 2 + 2;
-                        int bottomMiddlePointIndex = (y * 2 + 2) * newVerticeRow + x * 2 + 1;
-
-                        if (y == 0)
-                        {
-                            int topMiddelPointIndex = (y * 2) * newVerticeRow + x * 2 + 1;
-                            tempList[topMiddelPointIndex].Position = AverageDiamond(tempList[topLeftPointIndex].Position,
-                                                                                     tempList[topRightPointIndex].Position,
-                                                                                     tempList[middlePointIndex].Position,
-                                                                                      iter);
-                        }
-
-                        if (x == 0)
-                        {
-                            int leftMiddelPointIndex = (y * 2 + 1) * newVerticeRow + x * 2;
-                            tempList[leftMiddelPointIndex].Position = AverageDiamond(tempList[topLeftPointIndex].Position,
-                                                                                     tempList[bottomLeftPointIndex].Position,
-                                                                                     tempList[middlePointIndex].Position,
-                                                                                      iter);
-                        }
-
-                        if (x == oldSquaresRow - 1)
-                        {
-                            tempList[rightMiddlePointIndex].Position = AverageDiamond(tempList[topRightPointIndex].Position,
-                                                                                      tempList[bottomRightPointIndex].Position,
-                                                                                      tempList[middlePointIndex].Position,
-                                                                                      iter);
-                        }
-                        else
-                        {
-                            tempList[rightMiddlePointIndex].Position = AverageSquare(tempList[topRightPointIndex].Position,
-                                                                                      tempList[bottomRightPointIndex].Position,
-                                                                                      tempList[middlePointIndex].Position,
-                                                                                      tempList[rightMiddlePointIndex + 1].Position,
-                                                                                      iter);
-
-                        }
-                        if (y == oldSquaresRow - 1)
-                        {
-                            tempList[bottomMiddlePointIndex].Position = AverageDiamond(tempList[bottomLeftPointIndex].Position,
-                                                                                       tempList[bottomRightPointIndex].Position,
-                                                                                       tempList[middlePointIndex].Position,
-                                                                                      iter);
-                        }
-                        else
-                        {
-                            tempList[bottomMiddlePointIndex].Position = AverageSquare(tempList[bottomLeftPointIndex].Position,
-                                                                                      tempList[bottomRightPointIndex].Position,
-                                                                                      tempList[middlePointIndex].Position,
-                                                                                      tempList[bottomMiddlePointIndex + newVerticeRow].Position,
-                                                                                      iter);
-                        }
-                    }
-                }
-                //now store the temporary list to the real list for the next iteration or actual use
-                verticeList = tempList;
-            }
-
-        }*/
-
         private void SetUpVerticesBetter()
         {
             int squaresRow = (int)Math.Pow(2, iterations);
@@ -240,7 +97,6 @@ namespace FlightSim
             int verticeRow = (int)(Math.Pow(2, iterations + 1) + 1);
             int verticeTotal = (int)Math.Pow(verticeRow, 2);
             verticeList = new VertexPositionNormalColored[verticeTotal];
-            Console.WriteLine((float)width / verticeRow);
             
 
             for (int z = 0; z < verticeRow; z++)
@@ -252,13 +108,14 @@ namespace FlightSim
                     verticeList[index].Color = Color.Gray;
                 }
             }
+            
 
             verticeList[0].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
             verticeList[verticeRow - 1].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
             verticeList[verticeRow * (verticeRow - 1)].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
             verticeList[verticeRow * verticeRow - 1].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
 
-            for (int iter = 0; iter < iterations; iter++)
+            for (int iter = 0; iter < iterations+1; iter++)
             {
                 int iterSquaresRow = (int)Math.Pow(2, iter);
                 int verticesPerSquare = ((verticeRow-1) / iterSquaresRow);
@@ -267,15 +124,11 @@ namespace FlightSim
                     for (int z = 0; z < iterSquaresRow; z++)
                     {
                         int leftTopPoint = z * verticeRow * verticesPerSquare + x * verticesPerSquare;
-                        int topMiddlePoint = z * verticesPerSquare * verticeRow + x * verticesPerSquare + verticesPerSquare / 2;
                         int rightTopPoint = z * verticesPerSquare * verticeRow + x * verticesPerSquare + verticesPerSquare;
-                        int leftMiddlePoint = (z * verticesPerSquare + verticesPerSquare / 2) * verticeRow + x * verticesPerSquare;
                         int middlePoint = (z* verticesPerSquare + verticesPerSquare / 2)*verticeRow +  x*verticesPerSquare + verticesPerSquare/2;
-                        int rightMiddlePoint = (z * verticesPerSquare + verticesPerSquare) * verticeRow + x * verticesPerSquare + verticesPerSquare;
                         int leftBottomPoint = (z * verticesPerSquare + verticesPerSquare) * verticeRow + x * verticesPerSquare;
-                        int bottomMiddlePoint = (z * verticesPerSquare + verticesPerSquare) * verticeRow + x * verticesPerSquare + verticesPerSquare / 2;
                         int rightBottomPoint = (z * verticesPerSquare + verticesPerSquare) * verticeRow + x * verticesPerSquare + verticesPerSquare;
-
+                        
 
                         verticeList[middlePoint].Position.Y = AverageFloat(verticeList[leftTopPoint].Position.Y,
                                                                             verticeList[rightTopPoint].Position.Y,
@@ -284,6 +137,8 @@ namespace FlightSim
                                                                                       iter);
                     }
                 }
+
+                //Console.WriteLine("waar loopt ie vast" + iter);
                 for (int x = 0; x < iterSquaresRow; x++)
                 {
                     for (int z = 0; z < iterSquaresRow; z++)
@@ -293,7 +148,7 @@ namespace FlightSim
                         int rightTopPoint = z * verticesPerSquare * verticeRow + x * verticesPerSquare + verticesPerSquare;
                         int leftMiddlePoint = (z * verticesPerSquare + verticesPerSquare / 2) * verticeRow + x * verticesPerSquare;
                         int middlePoint = (z * verticesPerSquare + verticesPerSquare / 2) * verticeRow + x * verticesPerSquare + verticesPerSquare / 2;
-                        int rightMiddlePoint = (z * verticesPerSquare + verticesPerSquare) * verticeRow + x * verticesPerSquare + verticesPerSquare;
+                        int rightMiddlePoint = (z * verticesPerSquare + verticesPerSquare / 2) * verticeRow + x * verticesPerSquare + verticesPerSquare;
                         int leftBottomPoint = (z * verticesPerSquare + verticesPerSquare) * verticeRow + x * verticesPerSquare;
                         int bottomMiddlePoint = (z * verticesPerSquare + verticesPerSquare) * verticeRow + x * verticesPerSquare + verticesPerSquare / 2;
                         int rightBottomPoint = (z * verticesPerSquare + verticesPerSquare) * verticeRow + x * verticesPerSquare + verticesPerSquare;
@@ -306,7 +161,7 @@ namespace FlightSim
                                                                                       iter);
                         }
 
-                        if (z == 0)
+                        if (x == 0)
                         {
                             verticeList[leftMiddlePoint].Position.Y = AverageFloat(verticeList[leftTopPoint].Position.Y,
                                                                                      verticeList[leftBottomPoint].Position.Y,
@@ -347,16 +202,24 @@ namespace FlightSim
                         }
                     }
                 }
-            }
 
+                //Console.WriteLine("waar loopt ie vast, hiervoor?" + iter);
+            }
+            float highestY = 0;
+            float lowestY = 0;
             for (int i = 0; i < verticeList.Length; i++)
             {
-                if(verticeList[i].Position.Y == 0)
+                if(verticeList[i].Position.Y < lowestY)
                 {
-                    //Console.WriteLine(i);
+                    lowestY = verticeList[i].Position.Y;
+                }
+
+                if (verticeList[i].Position.Y > highestY)
+                {
+                    highestY = verticeList[i].Position.Y;
                 }
             }
-            Console.WriteLine(verticeList.Length);
+            Console.WriteLine(lowestY + " & " + highestY);
 
         }
 
@@ -365,7 +228,6 @@ namespace FlightSim
             int amountOfIndices = (int)Math.Pow(4, iterations) * 6;
             int squareRow = (int)Math.Pow(2, iterations );
             int verticeRow = (int)(Math.Pow(2, iterations +1) + 1);
-            Console.WriteLine(squareRow + "   "+ verticeRow);
 
             indiceList = new int[amountOfIndices];
 
@@ -439,7 +301,7 @@ namespace FlightSim
 
         public void GimmeDatImage(VertexPositionNormalColored[] vertices)
         {
-            Texture2D newTexture = new Texture2D(game.GraphicsDevice, (int)(Math.Pow(2, iterations) + 1), (int)(Math.Pow(2, iterations) + 1));
+            Texture2D newTexture = new Texture2D(game.GraphicsDevice, (int)(Math.Sqrt(vertices.Length)), (int)(Math.Sqrt(vertices.Length)));
             Color[] colorData = new Color[vertices.Length];
 
             for(int index = 0; index < vertices.Length; index++)
@@ -459,14 +321,15 @@ namespace FlightSim
             stream.Dispose();
             newTexture.Dispose();
         }
+
         public Vector3 AverageDiamond(Vector3 vec1, Vector3 vec2, Vector3 middlePoint, int iteration)
         {
             float newX = (vec1.X + vec2.X) / 2;
             float newY = ((vec1.Y + vec2.Y + middlePoint.Y) / 3);
-            newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(detail + 1, iteration);
+            newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(roughness + 1, iteration);
             while (newY < -maxHeight / 2 || newY > maxHeight / 2)
             {
-                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(detail + 1, iteration);
+                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(roughness + 1, iteration);
             }
             float newZ = (vec1.Z + vec2.Z) / 2;
             Vector3 newVector = new Vector3(newX, newY, newZ);
@@ -476,10 +339,10 @@ namespace FlightSim
         {
             float newX = (vec1.X + vec2.X + vec3.X + vec4.X) / 4;
             float newY = ((vec1.Y + vec2.Y + vec3.Y + vec4.Y) / 4);
-            newY += (((float)rng.NextDouble() - 0.5f) * maxHeight / 2) / (float)Math.Pow(detail + 1, iteration);
+            newY += (((float)rng.NextDouble() - 0.5f) * maxHeight / 2) / (float)Math.Pow(roughness + 1, iteration);
             while (newY < -maxHeight / 2 || newY > maxHeight / 2)
             {
-                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight / 2) / (float)Math.Pow(detail + 1, iteration);
+                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight / 2) / (float)Math.Pow(roughness + 1, iteration);
             }
             float newZ = (vec1.Z + vec2.Z + vec3.Z + vec4.Z) / 4;
             Vector3 newVector = new Vector3(newX, newY, newZ);
@@ -488,22 +351,22 @@ namespace FlightSim
         public float AverageFloat(float y1, float y2, float y3, int iteration)
         {
             float newY = (y1 + y2 + y3) / 3;
-            newY += (((float)rng.NextDouble() - 0.5f) * maxHeight);
-            while (newY < -maxHeight / 2 || newY > maxHeight / 2)
+            newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(roughness + 1, iteration);
+            /*while (newY < -maxHeight / 2 || newY > maxHeight / 2)
             {
-                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(detail + 1, iteration);
-            }
+                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(roughness + 1, iteration);
+            }*/
             return newY;
         }
 
         public float AverageFloat(float y1, float y2, float y3, float y4, int iteration)
         {
-            float newY = (y1 + y2 + y3+y4) / 4;
-            newY += (((float)rng.NextDouble() - 0.5f) * maxHeight);
-            while (newY < -maxHeight / 2 || newY > maxHeight / 2)
+            float newY = (y1 + y2 + y3 + y4) / 4;
+            newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(roughness + 1, iteration);
+            /*while (newY < -maxHeight / 2 || newY > maxHeight / 2)
             {
-                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(detail + 1, iteration);
-            }
+                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(roughness + 1, iteration);
+            }*/
             return newY;
         }
 

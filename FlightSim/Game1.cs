@@ -109,7 +109,7 @@ namespace FlightSim
             targetModel = LoadModel("target");
 
             city = new City(this, sceneryTexture);
-            terrain = new Terrain(this, new Vector2(0,0), 1024, 100, 5, 3, 0.85f);
+            terrain = new Terrain(this, new Vector2(0,0), 4096, 1024, 10, 3, 0.95f);
             xwing = new Plane(this, xwingModel, xwingTexture, bulletTexture);
             skyBox = new SkyBox(this, skyboxModel, skyboxTexture);
             
