@@ -30,7 +30,7 @@ namespace FlightSim
         {
             if (terrains[z * gridWidth + x + terrains.Length/2] == null)
             {
-                terrains[z * gridWidth + x + terrains.Length / 2] = new Terrain(z * gridWidth + x + terrains.Length / 2,game, this, new Vector2(x, z), terrainWidth, 1024, iterations, 0, 0.85f);
+                terrains[z * gridWidth + x + terrains.Length / 2] = new Terrain(z * gridWidth + x + terrains.Length / 2,game, this, new Vector2(x, z), terrainWidth, 4096, iterations, 3, 0.65f);
             }
         }
 

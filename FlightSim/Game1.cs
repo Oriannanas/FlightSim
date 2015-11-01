@@ -111,7 +111,7 @@ namespace FlightSim
 
             city = new City(this, sceneryTexture);
             terrainGrid = new TerrainGrid(this, 10, 4096);
-            //terrainGrid.LoadTerrain(-1, -1);
+            terrainGrid.LoadTerrain(-1, -1);
             terrainGrid.LoadTerrain(0, -1);
             terrainGrid.LoadTerrain(1, -1);
             terrainGrid.LoadTerrain(-1, 0);

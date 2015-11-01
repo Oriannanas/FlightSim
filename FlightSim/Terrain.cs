@@ -53,7 +53,12 @@ namespace FlightSim
             this.roughness = roughness;
             this.maxHeight = terrainHeight;
             SetUpVerticesBetter();
-            
+
+            for (int i = 0; i < verticeList.Length; i++)
+            {
+                verticeList[i].Position.Y *= (float)Math.Pow(verticeList[i].Position.Y, mountainy);
+                verticeList[i].Position.Y /= (float)Math.Pow(maxHeight/2, mountainy);
+            }
             //GimmeDatImage(verticeList);
 
             SetUpIndices();
