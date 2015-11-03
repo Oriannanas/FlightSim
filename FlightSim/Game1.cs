@@ -84,7 +84,7 @@ namespace FlightSim
 
             lightDirection.Normalize();
             noiseTest = CreateDiamondSquareNoiseTexture();
-            //noiseTest = CreatePerlinNoiseTexture(1024,1024, 0.2f,0.35f,0.5f,8, false);
+            //noiseTest = CreatePerlinNoiseTexture(1024,1024, 1f/128f,0.5f,0.5f,10, false);
             base.Initialize();
         }
 
@@ -270,7 +270,7 @@ namespace FlightSim
         
         Texture2D CreateDiamondSquareNoiseTexture()
         {
-            DiamondSquare dsn= new DiamondSquare(10, 0.75f, true);
+            DiamondSquare dsn= new DiamondSquare(7, 1f, true);
             float[] test = dsn.valueList;
             //Console.WriteLine(watch.ElapsedMilliseconds);
             Texture2D noiseTest = new Texture2D(GraphicsDevice, (int)Math.Sqrt(test.Length), (int)Math.Sqrt(test.Length));

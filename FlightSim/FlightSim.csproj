@@ -68,7 +68,7 @@
   <ItemGroup>
     <Compile Include="Bullet.cs" />
     <Compile Include="City.cs" />
-    <Compile Include="HelperClasses\Noise.cs" />
+    <Compile Include="HelperClasses\DiamondSquare.cs" />
     <Compile Include="HelperClasses\PerlinNoise.cs" />
     <Compile Include="Terrain.cs" />
     <Compile Include="Game1.cs" />

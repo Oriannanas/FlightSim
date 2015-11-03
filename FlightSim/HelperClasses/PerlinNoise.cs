@@ -20,9 +20,7 @@ namespace FlightSim
 
         /// Gets the value for a specific X and Y coordinate
         /// results in range [-1, 1] * maxHeight
-        public float GetRandomHeight(float X, float Y, float MaxHeight,
-            float Frequency, float Amplitude, float Persistance,
-            int Octaves)
+        public float GetRandomHeight(float X, float Y, float MaxHeight, float Frequency, float Amplitude, float Persistance, int Octaves)
         {
             GenerateNoise();
             float FinalValue = 0.0f;
