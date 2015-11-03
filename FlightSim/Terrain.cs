@@ -84,7 +84,6 @@ namespace FlightSim
 
             if (grid.CheckTerrain(index, -1, 0) != short.MinValue)
             {
-                Console.WriteLine("Left");
                 leftEdge = grid.GetTerrainEdge(grid.CheckTerrain(index, -1, 0), 1, 0);
                 leftLoaded = true;
             }
@@ -94,7 +93,6 @@ namespace FlightSim
             }
             if (grid.CheckTerrain(index, 1, 0) != short.MinValue)
             {
-                Console.WriteLine("right");
                 rightEdge = grid.GetTerrainEdge(grid.CheckTerrain(index, 1, 0), -1, 0);
                 rightLoaded = true;
             }
@@ -104,7 +102,6 @@ namespace FlightSim
             }
             if (grid.CheckTerrain(index, 0, -1) != short.MinValue)
             {
-                Console.WriteLine("top");
                 topEdge = grid.GetTerrainEdge(grid.CheckTerrain(index, 0, -1), 0, 1);
                 topLoaded = true;
             }
@@ -114,7 +111,6 @@ namespace FlightSim
             }
             if (grid.CheckTerrain(index, 0, 1) != short.MinValue)
             {
-                Console.WriteLine("bottom");
                 bottomEdge = grid.GetTerrainEdge(grid.CheckTerrain(index, 0, 1), 0, -1);
                 bottomLoaded = true;
             }
@@ -150,63 +146,6 @@ namespace FlightSim
                     }
                 }
             }
-            /*if (!topLoaded && !leftLoaded)
-            {
-                verticeList[0].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
-                topEdge[0] = verticeList[0].Position.Y;
-                leftEdge[verticeRow - 1] = verticeList[0].Position.Y;
-            }
-            else if(topLoaded)
-            {
-                verticeList[0].Position.Y = topEdge[0];
-            }
-            else
-            {
-                verticeList[0].Position.Y =leftEdge[verticeRow - 1];
-            }
-
-            if (!topLoaded &&  !rightLoaded) {
-                verticeList[verticeRow - 1].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
-                topEdge[verticeRow - 1] = verticeList[verticeRow - 1].Position.Y;
-                rightEdge[0] = verticeList[verticeRow - 1].Position.Y;
-            }
-            else if (topLoaded)
-            {
-                verticeList[verticeRow - 1].Position.Y = topEdge[verticeRow - 1];
-            }
-            else
-            {
-                verticeList[verticeRow - 1].Position.Y = rightEdge[0];
-            }
-
-            if (!bottomLoaded && !leftLoaded) {
-                verticeList[verticeRow * (verticeRow - 1)].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
-                bottomEdge[0] = verticeList[verticeRow * (verticeRow - 1)].Position.Y;
-                leftEdge[0] = verticeList[verticeRow * (verticeRow - 1)].Position.Y;
-            }
-            else if (bottomLoaded)
-            {
-                verticeList[verticeRow * (verticeRow - 1)].Position.Y = bottomEdge[0];
-            }
-            else
-            {
-                verticeList[verticeRow * (verticeRow - 1)].Position.Y = leftEdge[0];
-            }
-
-            if (!bottomLoaded && !rightLoaded)
-            {
-                verticeList[verticeRow * verticeRow - 1].Position.Y = ((float)rng.NextDouble() - 0.5f) * maxHeight;
-                bottomEdge[verticeRow - 1] = verticeList[verticeRow * verticeRow - 1].Position.Y;
-                rightEdge[verticeRow - 1] = verticeList[verticeRow * verticeRow - 1].Position.Y;
-            }
-            else if (bottomLoaded)
-            {
-                verticeList[verticeRow * verticeRow - 1].Position.Y = bottomEdge[verticeRow - 1];
-            }
-            else
-            {
-                verticeList[verticeRow * verticeRow - 1].Position.Y = rightEdge[verticeRow - 1];
-            }*/
 
             for (int iter = 1; iter <= iterations; iter++)
             {
