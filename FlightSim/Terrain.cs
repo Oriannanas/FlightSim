@@ -33,17 +33,20 @@ namespace FlightSim
         {
             get; private set;
         }
+        float[] cornerValues;
         int[] indiceList;
         int iterations;
         int width;
         int maxHeight;
         int verticeListLength;
+        public DiamondSquare ds;
         int indiceListLength;
         float roughness;
         VertexBuffer vertexBuffer;
         IndexBuffer indexBuffer;
-        public Terrain(int index, Game1 game, TerrainGrid grid, Vector2 position, int width, int terrainHeight, int iterations, float mountainy, float roughness)
+        public Terrain(int index, Game1 game, TerrainGrid grid, Vector2 position, int width, int terrainHeight, int iterations, float mountainy, float roughness, float[] cornerValues)
         {
+            this.cornerValues = cornerValues;
             this.index = index;
             this.game = game;
             this.grid = grid;
@@ -52,236 +55,58 @@ namespace FlightSim
             this.iterations = iterations;
             this.roughness = roughness;
             this.maxHeight = terrainHeight;
-            SetUpVerticesBetter();
-
-            for (int i = 0; i < verticeList.Length; i++)
-            {
-                verticeList[i].Position.Y *= (float)Math.Pow(verticeList[i].Position.Y, mountainy);
-                verticeList[i].Position.Y /= (float)Math.Pow(maxHeight/2, mountainy);
-            }
-            //GimmeDatImage(verticeList);
-
+            SetUpVertices();
+            
             SetUpIndices();
 
             CopyToBuffers();
             GenerateNormals(vertexBuffer, indexBuffer);
         }
 
-        private void SetUpVerticesBetter()
+        private void SetUpVertices()
         {
             int squaresRow = (int)Math.Pow(2, iterations);
             int squaresTotal = (int)Math.Pow(squaresRow, 2);
             int verticeRow = (int)(Math.Pow(2, iterations) + 1);
             int verticeTotal = (int)Math.Pow(verticeRow, 2);
-            
 
             verticeList = new VertexPositionNormalColored[verticeTotal];
 
-            bool leftLoaded = false;
-            bool rightLoaded = false;
-            bool topLoaded = false;
-            bool bottomLoaded = false; 
+            List<DiamondSquare> neighboors = new List<DiamondSquare>();
+            List<Side> neighboorSides = new List<Side>();
 
-            if (grid.CheckTerrain(index, -1, 0) != short.MinValue)
+            if (grid.GetTerrain(index, -1, 0) != null)
             {
-                leftEdge = grid.GetTerrainEdge(grid.CheckTerrain(index, -1, 0), 1, 0);
-                leftLoaded = true;
+                neighboors.Add(grid.GetTerrain(index, -1, 0).ds);
+                neighboorSides.Add(Side.Left);
             }
-            else
+            if (grid.GetTerrain(index, 1, 0) != null)
             {
-                leftEdge = new float[verticeRow];
+                neighboors.Add(grid.GetTerrain(index, 1, 0).ds);
+                neighboorSides.Add(Side.Right);
             }
-            if (grid.CheckTerrain(index, 1, 0) != short.MinValue)
+            if (grid.GetTerrain(index, 0, 1) != null)
             {
-                rightEdge = grid.GetTerrainEdge(grid.CheckTerrain(index, 1, 0), -1, 0);
-                rightLoaded = true;
+                neighboors.Add(grid.GetTerrain(index, 0, 1).ds);
+                neighboorSides.Add(Side.Bottom);
             }
-            else
+            if (grid.GetTerrain(index, 0, -1) != null)
             {
-                rightEdge = new float[verticeRow];
-            }
-            if (grid.CheckTerrain(index, 0, -1) != short.MinValue)
-            {
-                topEdge = grid.GetTerrainEdge(grid.CheckTerrain(index, 0, -1), 0, 1);
-                topLoaded = true;
-            }
-            else
-            {
-                topEdge = new float[verticeRow];
-            }
-            if (grid.CheckTerrain(index, 0, 1) != short.MinValue)
-            {
-                bottomEdge = grid.GetTerrainEdge(grid.CheckTerrain(index, 0, 1), 0, -1);
-                bottomLoaded = true;
-            }
-            else
-            {
-                bottomEdge = new float[verticeRow];
+                neighboors.Add(grid.GetTerrain(index, 0, -1).ds);
+                neighboorSides.Add(Side.Top);
             }
 
+
+            ds = new DiamondSquare(iterations, roughness, false, cornerValues, neighboors.ToArray(), neighboorSides.ToArray());
 
             for (int z = 0; z < verticeRow; z++)
             {
                 for (int x = 0; x < verticeRow; x++)
                 {
                     int index = z * verticeRow + x;
-                    verticeList[index].Position = new Vector3(x * ((float)width / (verticeRow - 1)), 0, -z * ((float)width / (verticeRow - 1)));
-                    if (x == 0 && leftLoaded)
-                    {
-                        verticeList[index].Position.Y = leftEdge[z];
-                    }
-                    if (x == verticeRow - 1 && rightLoaded)
-                    {
-
-                        verticeList[index].Position.Y = rightEdge[z];
-                    }
-                    if (z == 0 && bottomLoaded)
-                    {
-                        verticeList[index].Position.Y = bottomEdge[x];
-                    }
-                    if (z == verticeRow - 1 && topLoaded)
-                    {
-
-                        verticeList[index].Position.Y = topEdge[x];
-                    }
+                    verticeList[index].Position = new Vector3(x * ((float)width / (verticeRow - 1)), ds.valueList[index]*maxHeight, -z * ((float)width / (verticeRow - 1)));
                 }
             }
-
-            for (int iter = 1; iter <= iterations; iter++)
-            {
-                int iterSquaresRow = (int)Math.Pow(2, iter);
-                int verticesPerSquare = ((verticeRow - 1) / iterSquaresRow);
-                for (int x = 0; x < iterSquaresRow; x++)
-                {
-                    for (int z = 0; z < iterSquaresRow; z++)
-                    {
-                        int leftTopPoint = z * verticeRow * verticesPerSquare + x * verticesPerSquare;
-                        int rightTopPoint = z * verticesPerSquare * verticeRow + x * verticesPerSquare + verticesPerSquare;
-                        int middlePoint = (z * verticesPerSquare + verticesPerSquare / 2) * verticeRow + x * verticesPerSquare + verticesPerSquare / 2;
-                        int leftBottomPoint = (z * verticesPerSquare + verticesPerSquare) * verticeRow + x * verticesPerSquare;
-                        int rightBottomPoint = (z * verticesPerSquare + verticesPerSquare) * verticeRow + x * verticesPerSquare + verticesPerSquare;
-
-
-                        verticeList[middlePoint].Position.Y = AverageFloat(verticeList[leftTopPoint].Position.Y,
-                                                                            verticeList[rightTopPoint].Position.Y,
-                                                                            verticeList[leftBottomPoint].Position.Y,
-                                                                            verticeList[rightBottomPoint].Position.Y,
-                                                                                      iter);
-                    }
-                }
-                for (int x = 0; x < iterSquaresRow; x++)
-                {
-                    for (int z = 0; z < iterSquaresRow; z++)
-                    {
-                        int leftTopPoint = z * verticeRow * verticesPerSquare + x * verticesPerSquare;
-                        int topMiddlePoint = z * verticesPerSquare * verticeRow + x * verticesPerSquare + verticesPerSquare / 2;
-                        int rightTopPoint = z * verticesPerSquare * verticeRow + x * verticesPerSquare + verticesPerSquare;
-                        int leftMiddlePoint = (z * verticesPerSquare + verticesPerSquare / 2) * verticeRow + x * verticesPerSquare;
-                        int middlePoint = (z * verticesPerSquare + verticesPerSquare / 2) * verticeRow + x * verticesPerSquare + verticesPerSquare / 2;
-                        int rightMiddlePoint = (z * verticesPerSquare + verticesPerSquare / 2) * verticeRow + x * verticesPerSquare + verticesPerSquare;
-                        int leftBottomPoint = (z * verticesPerSquare + verticesPerSquare) * verticeRow + x * verticesPerSquare;
-                        int bottomMiddlePoint = (z * verticesPerSquare + verticesPerSquare) * verticeRow + x * verticesPerSquare + verticesPerSquare / 2;
-                        int rightBottomPoint = (z * verticesPerSquare + verticesPerSquare) * verticeRow + x * verticesPerSquare + verticesPerSquare;
-
-                        if (x == 0)
-                        {
-                            if (!leftLoaded)
-                            {
-                                verticeList[leftMiddlePoint].Position.Y = AverageFloat(verticeList[leftTopPoint].Position.Y,
-                                                                                         verticeList[leftBottomPoint].Position.Y,
-                                                                                         verticeList[middlePoint].Position.Y,
-                                                                                          iter);
-                                leftEdge[z * verticesPerSquare + verticesPerSquare / 2] = verticeList[leftMiddlePoint].Position.Y;
-                            }
-                            else
-                            {
-                                verticeList[leftMiddlePoint].Position.Y = leftEdge[z * verticesPerSquare + verticesPerSquare / 2];
-                            }
-                        }
-                        if (z == 0)
-                        {
-                            if (!topLoaded)
-                            {
-                                verticeList[topMiddlePoint].Position.Y = AverageFloat(verticeList[leftTopPoint].Position.Y,
-                                                                                         verticeList[rightTopPoint].Position.Y,
-                                                                                         verticeList[middlePoint].Position.Y,
-                                                                                          iter);
-                                topEdge[x * verticesPerSquare + verticesPerSquare / 2] = verticeList[topMiddlePoint].Position.Y;
-                            }
-                            else
-                            {
-                                verticeList[topMiddlePoint].Position.Y = topEdge[x * verticesPerSquare + verticesPerSquare / 2];
-                            }
-                        }
-
-
-                        if (x == iterSquaresRow - 1)
-                        {
-                            if (!rightLoaded)
-                            {
-                                verticeList[rightMiddlePoint].Position.Y = AverageFloat(verticeList[rightTopPoint].Position.Y,
-                                                                                          verticeList[rightBottomPoint].Position.Y,
-                                                                                          verticeList[middlePoint].Position.Y,
-                                                                                          iter);
-                                rightEdge[z * verticesPerSquare + verticesPerSquare / 2] = verticeList[rightMiddlePoint].Position.Y;
-                            }
-                            else
-                            {
-                                verticeList[rightMiddlePoint].Position.Y = rightEdge[z * verticesPerSquare + verticesPerSquare / 2];
-                            }
-                        }
-                        else
-                        {
-                            verticeList[rightMiddlePoint].Position.Y = AverageFloat(verticeList[rightTopPoint].Position.Y,
-                                                                                      verticeList[rightBottomPoint].Position.Y,
-                                                                                      verticeList[middlePoint].Position.Y,
-                                                                                      verticeList[rightMiddlePoint + verticesPerSquare / 2].Position.Y,
-                                                                                      iter);
-
-                        }
-                        if (z == (iterSquaresRow - 1))
-                        {
-                            if (!bottomLoaded)
-                            {
-                                verticeList[bottomMiddlePoint].Position.Y = AverageFloat(verticeList[leftBottomPoint].Position.Y,
-                                                                                           verticeList[rightBottomPoint].Position.Y,
-                                                                                           verticeList[middlePoint].Position.Y,
-                                                                                          iter);
-                                bottomEdge[x * verticesPerSquare + verticesPerSquare / 2] = verticeList[bottomMiddlePoint].Position.Y;
-                            }
-                            else
-                            {
-                                verticeList[bottomMiddlePoint].Position.Y = bottomEdge[x * verticesPerSquare + verticesPerSquare / 2];
-
-                            }
-                        }
-                        else
-                        {
-                            verticeList[bottomMiddlePoint].Position.Y = AverageFloat(verticeList[leftBottomPoint].Position.Y,
-                                                                                      verticeList[rightBottomPoint].Position.Y,
-                                                                                      verticeList[middlePoint].Position.Y,
-                                                                                      verticeList[bottomMiddlePoint + (verticesPerSquare / 2) * verticeRow].Position.Y,
-                                                                                      iter);
-                        }
-                    }
-                }
-            }
-            float highestY = 0;
-            float lowestY = 0;
-            for (int i = 0; i < verticeList.Length; i++)
-            {
-                if (verticeList[i].Position.Y < lowestY)
-                {
-                    lowestY = verticeList[i].Position.Y;
-                }
-
-                if (verticeList[i].Position.Y > highestY)
-                {
-                    highestY = verticeList[i].Position.Y;
-                }
-            }
-
-
         }
 
         private void SetUpIndices()

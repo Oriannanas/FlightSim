@@ -112,13 +112,13 @@ namespace FlightSim
             targetModel = LoadModel("target");
 
             city = new City(this, sceneryTexture);
-            /*terrainGrid = new TerrainGrid(this, 10, 4096);
+            terrainGrid = new TerrainGrid(this, 5, 512);
             terrainGrid.LoadTerrain(-1, -1);
             terrainGrid.LoadTerrain(0, -1);
             terrainGrid.LoadTerrain(1, -1);
             terrainGrid.LoadTerrain(-1, 0);
             terrainGrid.LoadTerrain(0, 0);
-            terrainGrid.LoadTerrain(1, 0);*/
+            terrainGrid.LoadTerrain(1, 0);
             xwing = new Plane(this, xwingModel, xwingTexture, bulletTexture);
             skyBox = new SkyBox(this, skyboxModel, skyboxTexture);
             
@@ -261,16 +261,16 @@ namespace FlightSim
             {
                 target.Draw(drawHelper);
             }
-            //terrainGrid.Draw(drawHelper);
-            spriteBatch.Begin();
+            terrainGrid.Draw(drawHelper);
+            /*spriteBatch.Begin();
             spriteBatch.Draw(noiseTest, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), Color.White);
-            spriteBatch.End();
+            spriteBatch.End();*/
             base.Draw(gameTime);
         }
         
         Texture2D CreateDiamondSquareNoiseTexture()
         {
-            DiamondSquare dsn= new DiamondSquare(7, 1f, true);
+            DiamondSquare dsn= new DiamondSquare(7, 1f, true, new float[4] { 0,0,0,0});
             float[] test = dsn.valueList;
             //Console.WriteLine(watch.ElapsedMilliseconds);
             Texture2D noiseTest = new Texture2D(GraphicsDevice, (int)Math.Sqrt(test.Length), (int)Math.Sqrt(test.Length));
