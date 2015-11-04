@@ -270,7 +270,7 @@ namespace FlightSim
         
         Texture2D CreateDiamondSquareNoiseTexture()
         {
-            DiamondSquare dsn= new DiamondSquare(7, 1f, true, new float[4] { 0,0,0,0});
+            DiamondSquare dsn = new DiamondSquare(new Random(), 7, 1f, true, new float[4] { 0,0,0,0});
             float[] test = dsn.valueList;
             //Console.WriteLine(watch.ElapsedMilliseconds);
             Texture2D noiseTest = new Texture2D(GraphicsDevice, (int)Math.Sqrt(test.Length), (int)Math.Sqrt(test.Length));

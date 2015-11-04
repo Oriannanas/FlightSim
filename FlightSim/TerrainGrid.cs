@@ -8,6 +8,7 @@ namespace FlightSim
 {
     public class TerrainGrid
     {
+        Random rng;
         private Game1 game;
         private DiamondSquare heightMap;
         private Terrain[] terrains;
@@ -18,7 +19,8 @@ namespace FlightSim
 
         public TerrainGrid(Game1 game, int iterations, int terrainWidth)
         {
-            heightMap = new DiamondSquare(5, 1, false, new float[4] {0,0,0,0});
+            rng = new Random();
+            heightMap = new DiamondSquare(rng, 5, 1, false, new float[4] {0,0,0,0});
             for(int i = 0; i < heightMap.valueList.Length; i++)
             {
                 heightMap.valueList[i] *= 10;
@@ -36,7 +38,7 @@ namespace FlightSim
             int index = z * gridWidth + x + terrains.Length / 2;
             if (terrains[index] == null)
             {
-                terrains[index] = new Terrain(index, game, this, new Vector2(x, z), terrainWidth, 64, iterations, 3, 1f, 
+                terrains[index] = new Terrain(rng, index, game, this, new Vector2(x, z), terrainWidth, 64, iterations, 3, 1f, 
                     new float[4] { heightMap.valueList[z*gridWidth + x + terrains.Length/2], heightMap.valueList[z * gridWidth + x + terrains.Length / 2 + 1], heightMap.valueList[(z + 1) * gridWidth + x + terrains.Length / 2], heightMap.valueList[(z+1) * gridWidth + x + terrains.Length / 2 + 1] });
             }
         }

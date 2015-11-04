@@ -15,7 +15,7 @@ namespace FlightSim
 
     public class DiamondSquare
     {
-        private Random rng = new Random();
+        private Random rng;
         
         private DiamondSquare leftEdge = null;
         private DiamondSquare rightEdge = null;
@@ -34,8 +34,9 @@ namespace FlightSim
         float roughness;
         bool clamp;
 
-        public DiamondSquare(int iterations, float roughness, bool clamp, float[] cornerValues)
+        public DiamondSquare(Random rng, int iterations, float roughness, bool clamp, float[] cornerValues)
         {
+            this.rng = rng;
             this.cornerValues = cornerValues;
             this.iterations = iterations;
             this.roughness = roughness;
@@ -43,8 +44,9 @@ namespace FlightSim
 
             GenerateValues();
         }
-        public DiamondSquare(int iterations, float roughness, bool clamp, float[] cornerValues, DiamondSquare[] neighboors, Side[] neighboorSides)
+        public DiamondSquare(Random rng, int iterations, float roughness, bool clamp, float[] cornerValues, DiamondSquare[] neighboors, Side[] neighboorSides)
         {
+            this.rng = rng;
             this.cornerValues = cornerValues;
             this.iterations = iterations;
             this.roughness = roughness;
@@ -85,9 +87,7 @@ namespace FlightSim
             valueList[pointsPerRow - 1] = cornerValues[1];
             valueList[pointsPerGrid - pointsPerRow] = cornerValues[2];
             valueList[pointsPerGrid - 1] = cornerValues[3];
-
-            Console.Write("initial: ");
-            Console.WriteLine(valueList[0] + ", " + valueList[pointsPerRow - 1] + ", " + valueList[pointsPerGrid - pointsPerRow] + ", " + valueList[pointsPerGrid - 1]);
+            
 
             for (int iter = 1; iter < iterations; iter++)
             {
@@ -106,10 +106,6 @@ namespace FlightSim
 
 
                         valueList[middlePoint] = AverageRandomFloat(valueList[leftTopPoint], valueList[rightTopPoint], valueList[leftBottomPoint], valueList[rightBottomPoint], amplitude);
-                        if(middlePoint == 0)
-                        {
-                            Console.WriteLine("middlepoint");
-                        }
                     }
                 }
                 for (int x = 0; x < iterSquaresRow; x++)
@@ -133,12 +129,12 @@ namespace FlightSim
                             }
                             else
                             {
-                                int neighboorValue = (z * verticesPerSquare + verticesPerSquare / 2) * pointsPerRow + (iterSquaresRow - 1) * verticesPerSquare + verticesPerSquare / 2;
-                                valueList[leftMiddlePoint] = AverageRandomFloat(valueList[leftTopPoint], valueList[leftBottomPoint], valueList[middlePoint], leftEdge.valueList[neighboorValue], amplitude);
-                            }
-                            if (leftMiddlePoint == 0)
-                            {
-                                Console.WriteLine("leftMiddlePoint X:" + x + "z " + z + "iter " + iter);
+                                int neighbourValue = (z * verticesPerSquare + verticesPerSquare / 2) * pointsPerRow + (iterSquaresRow - 1) * verticesPerSquare + verticesPerSquare / 2;
+                                int neighbourEdgeValue = (z * verticesPerSquare + verticesPerSquare / 2) * pointsPerRow + (iterSquaresRow - 1) * verticesPerSquare + verticesPerSquare;
+
+                                float newValue = AverageRandomFloat(valueList[leftTopPoint], valueList[leftBottomPoint], valueList[middlePoint], leftEdge.valueList[neighbourValue], amplitude);
+                                valueList[leftMiddlePoint] = newValue;
+                                leftEdge.valueList[neighbourEdgeValue] = newValue;
                             }
                         }
                         if (z == 0)
@@ -149,12 +145,12 @@ namespace FlightSim
                             }
                             else
                             {
-                                valueList[topMiddlePoint] = AverageRandomFloat(valueList[leftTopPoint], valueList[rightTopPoint], valueList[middlePoint],
-                                   topEdge.valueList[((iterSquaresRow - 1) * verticesPerSquare + verticesPerSquare / 2) * pointsPerRow + x * verticesPerSquare + verticesPerSquare / 2], amplitude);
-                            }
-                            if (topMiddlePoint == 0)
-                            {
-                                Console.WriteLine("topMiddlePoint");
+                                int neighbourValue = ((iterSquaresRow - 1) * verticesPerSquare + verticesPerSquare / 2) * pointsPerRow + x * verticesPerSquare + verticesPerSquare / 2;
+                                int neighbourEdgeValue = ((iterSquaresRow - 1) * verticesPerSquare + verticesPerSquare) * pointsPerRow + x * verticesPerSquare + verticesPerSquare / 2;
+
+                                float newValue = AverageRandomFloat(valueList[leftTopPoint], valueList[rightTopPoint], valueList[middlePoint], topEdge.valueList[neighbourValue], amplitude);
+                                valueList[topMiddlePoint] = newValue;
+                                topEdge.valueList[neighbourEdgeValue] = newValue;
                             }
                         }
                         if (x == iterSquaresRow - 1)
@@ -165,18 +161,18 @@ namespace FlightSim
                             }
                             else
                             {
-                                valueList[rightMiddlePoint] = AverageRandomFloat(valueList[rightTopPoint], valueList[rightBottomPoint], valueList[middlePoint],
-                                    rightEdge.valueList[(z * verticesPerSquare + verticesPerSquare / 2) * pointsPerRow + verticesPerSquare / 2], amplitude);
+                                int neighbourValue = (z * verticesPerSquare + verticesPerSquare / 2) * pointsPerRow + verticesPerSquare / 2;
+                                int neighbourEdgeValue = (z * verticesPerSquare + verticesPerSquare / 2) * pointsPerRow;
+
+                                float newValue =AverageRandomFloat(valueList[rightTopPoint], valueList[rightBottomPoint], valueList[middlePoint], rightEdge.valueList[neighbourValue], amplitude);
+                                valueList[rightMiddlePoint] = newValue;
+                                rightEdge.valueList[neighbourEdgeValue] = newValue;
                             }
                         }
                         else
                         {
                             valueList[rightMiddlePoint] = AverageRandomFloat(valueList[rightTopPoint], valueList[rightBottomPoint], valueList[middlePoint], valueList[rightMiddlePoint + verticesPerSquare / 2], amplitude);
 
-                        }
-                        if (rightMiddlePoint == 0)
-                        {
-                            Console.WriteLine("rightMiddlePoint");
                         }
                         if (z == iterSquaresRow - 1)
                         {
@@ -186,21 +182,21 @@ namespace FlightSim
                             }
                             else
                             {
-                                valueList[bottomMiddlePoint] = AverageRandomFloat(valueList[leftBottomPoint], valueList[rightBottomPoint], valueList[middlePoint],
-                                    bottomEdge.valueList[(verticesPerSquare / 2) * pointsPerRow + x * verticesPerSquare + verticesPerSquare / 2], amplitude);
+                                int neighbourValue = (verticesPerSquare / 2) * pointsPerRow + x * verticesPerSquare + verticesPerSquare / 2;
+                                int neighbourEdgeValue = x * verticesPerSquare + verticesPerSquare / 2;
+
+                                float newValue = AverageRandomFloat(valueList[leftBottomPoint], valueList[rightBottomPoint], valueList[middlePoint], bottomEdge.valueList[neighbourValue], amplitude);
+                                valueList[bottomMiddlePoint] = newValue;
+                                bottomEdge.valueList[neighbourEdgeValue] = newValue;
                             }
                         }
                         else
                         {
                             valueList[bottomMiddlePoint] = AverageRandomFloat(valueList[leftBottomPoint], valueList[rightBottomPoint], valueList[middlePoint], valueList[bottomMiddlePoint + (verticesPerSquare / 2) * pointsPerRow], amplitude);
                         }
-                        if (bottomMiddlePoint == 0)
-                        {
-                            Console.WriteLine("bottomMiddlePoint");
-                        }
                     }
                 }
-            }/*
+            }
             if (clamp)
             {
                 float highestValue = 0.5f;
@@ -227,32 +223,10 @@ namespace FlightSim
                 {
                     valueList[i] = valueList[i] * multiplier;
                 }
-            }*/
-
-            Console.Write("after: ");
-            Console.WriteLine(valueList[0] + ", " + valueList[pointsPerRow - 1] + ", " + valueList[pointsPerGrid - pointsPerRow] + ", " + valueList[pointsPerGrid - 1]);
+            }
+            
         }
-
-        private void RegenerateRightEdge()
-        {
-
-        }
-
-        private void RegenerateLeftEdge()
-        {
-
-        }
-
-        private void RegenerateTopEdge()
-        {
-
-        }
-
-        private void RegenerateBottomEdge()
-        {
-
-        }
-
+        
         private float AverageRandomFloat(float value1, float value2, float value3, float amplitude)
         {
             float newY = (value1 + value2 + value3) / 3;

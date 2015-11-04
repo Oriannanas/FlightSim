@@ -10,12 +10,12 @@ namespace FlightSim
 {
     public class Terrain
     {
+        Random rng;
         public int index;
         Game1 game;
         TerrainGrid grid;
 
         Vector2 position;
-        Random rng = new Random();
         VertexPositionNormalColored[] verticeList;
         public float[] leftEdge
         {
@@ -44,8 +44,9 @@ namespace FlightSim
         float roughness;
         VertexBuffer vertexBuffer;
         IndexBuffer indexBuffer;
-        public Terrain(int index, Game1 game, TerrainGrid grid, Vector2 position, int width, int terrainHeight, int iterations, float mountainy, float roughness, float[] cornerValues)
+        public Terrain(Random rng, int index, Game1 game, TerrainGrid grid, Vector2 position, int width, int terrainHeight, int iterations, float mountainy, float roughness, float[] cornerValues)
         {
+            this.rng = rng;
             this.cornerValues = cornerValues;
             this.index = index;
             this.game = game;
@@ -97,7 +98,7 @@ namespace FlightSim
             }
 
 
-            ds = new DiamondSquare(iterations, roughness, false, cornerValues, neighboors.ToArray(), neighboorSides.ToArray());
+            ds = new DiamondSquare(rng, iterations, roughness, false, cornerValues, neighboors.ToArray(), neighboorSides.ToArray());
 
             for (int z = 0; z < verticeRow; z++)
             {
@@ -185,7 +186,7 @@ namespace FlightSim
             vb.SetData(vertices);
         }
 
-        public void GimmeDatImage(VertexPositionNormalColored[] vertices)
+        /*public void GimmeDatImage(VertexPositionNormalColored[] vertices)
         {
             Texture2D newTexture = new Texture2D(game.GraphicsDevice, (int)(Math.Sqrt(vertices.Length)), (int)(Math.Sqrt(vertices.Length)));
             Color[] colorData = new Color[vertices.Length];
@@ -206,55 +207,7 @@ namespace FlightSim
             newTexture.SaveAsPng(stream, newTexture.Width, newTexture.Height);
             stream.Dispose();
             newTexture.Dispose();
-        }
-
-        public Vector3 AverageDiamond(Vector3 vec1, Vector3 vec2, Vector3 middlePoint, int iteration)
-        {
-            float newX = (vec1.X + vec2.X) / 2;
-            float newY = ((vec1.Y + vec2.Y + middlePoint.Y) / 3);
-            newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(roughness + 1, iteration);
-            while (newY < -maxHeight / 2 || newY > maxHeight / 2)
-            {
-                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(roughness + 1, iteration);
-            }
-            float newZ = (vec1.Z + vec2.Z) / 2;
-            Vector3 newVector = new Vector3(newX, newY, newZ);
-            return newVector;
-        }
-        public Vector3 AverageSquare(Vector3 vec1, Vector3 vec2, Vector3 vec3, Vector3 vec4, int iteration)
-        {
-            float newX = (vec1.X + vec2.X + vec3.X + vec4.X) / 4;
-            float newY = ((vec1.Y + vec2.Y + vec3.Y + vec4.Y) / 4);
-            newY += (((float)rng.NextDouble() - 0.5f) * maxHeight / 2) / (float)Math.Pow(roughness + 1, iteration);
-            while (newY < -maxHeight / 2 || newY > maxHeight / 2)
-            {
-                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight / 2) / (float)Math.Pow(roughness + 1, iteration);
-            }
-            float newZ = (vec1.Z + vec2.Z + vec3.Z + vec4.Z) / 4;
-            Vector3 newVector = new Vector3(newX, newY, newZ);
-            return newVector;
-        }
-        public float AverageFloat(float y1, float y2, float y3, int iteration)
-        {
-            float newY = (y1 + y2 + y3) / 3;
-            newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(roughness + 1, iteration);
-            /*while (newY < -maxHeight / 2 || newY > maxHeight / 2)
-            {
-                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(roughness + 1, iteration);
-            }*/
-            return newY;
-        }
-
-        public float AverageFloat(float y1, float y2, float y3, float y4, int iteration)
-        {
-            float newY = (y1 + y2 + y3 + y4) / 4;
-            newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(roughness + 1, iteration);
-            /*while (newY < -maxHeight / 2 || newY > maxHeight / 2)
-            {
-                newY += (((float)rng.NextDouble() - 0.5f) * maxHeight) / (float)Math.Pow(roughness + 1, iteration);
-            }*/
-            return newY;
-        }
+        }*/
 
         private void CopyToBuffers()
         {

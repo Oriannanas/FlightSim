@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <SourceFile>C:/Users/Marijn/Desktop/Projects/FlightSim/FlightSim/Content/xwing.png</SourceFile>
-  <SourceTime>2015-10-27T01:19:34.425374+01:00</SourceTime>
-  <DestFile>C:/Users/Marijn/Desktop/Projects/FlightSim/FlightSim/Content/bin/Windows/xwing_0.xnb</DestFile>
-  <DestTime>2015-11-04T12:49:16.1419303+01:00</DestTime>
+  <SourceFile>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/xwing.png</SourceFile>
+  <SourceTime>2015-10-23T18:47:19.7884975+02:00</SourceTime>
+  <DestFile>C:/Users/marijn/Documents/Visual Studio 2015/Projects/FlightSim/FlightSim/Content/bin/Windows/xwing_0.xnb</DestFile>
+  <DestTime>2015-11-04T16:26:44.7556153+01:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2015-04-29T19:14:44+02:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
