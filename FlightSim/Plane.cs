@@ -17,7 +17,7 @@ namespace FlightSim
         Texture2D bulletTexture;
 
         double lastBulletTime = 0;
-        public Vector3 position{ get; private set; } = new Vector3(0, 256, 0);
+        public Vector3 position{ get; private set; } = new Vector3(8, 3, -5);
 
         public float moveSpeed { get; private set; }
         // Up and down rotational variables
@@ -44,16 +44,16 @@ namespace FlightSim
             UpdateBullets();
             position = position.MoveForward(rotation, moveSpeed);
 
-            moveSpeed = (gameTime.ElapsedGameTime.Milliseconds / 50.0f) * game.gameSpeed;
+            moveSpeed = (gameTime.ElapsedGameTime.Milliseconds / 750.0f) * game.gameSpeed;
             float turningSpeed = ((float)gameTime.ElapsedGameTime.TotalMilliseconds / 1000.0f) * game.gameSpeed;
 
             float leftRightRot = 0;
 
             KeyboardState keys = Keyboard.GetState();
             if (keys.IsKeyDown(Keys.Right))
-                leftRightRot += turningSpeed*1.6f;
+                leftRightRot += turningSpeed;
             if (keys.IsKeyDown(Keys.Left))
-                leftRightRot -= turningSpeed * 1.6f;
+                leftRightRot -= turningSpeed;
 
             if (keys.IsKeyDown(Keys.W))
             {
@@ -61,11 +61,7 @@ namespace FlightSim
             }
             else if (keys.IsKeyDown(Keys.S))
             {
-                moveSpeed *= -1.5f;
-            }
-            else
-            {
-                moveSpeed = 0;
+                moveSpeed *= 0.5f;
             }
 
             if (keys.IsKeyDown(Keys.A))
@@ -164,7 +160,7 @@ namespace FlightSim
                     i--;
 
                     if (colType == CollisionType.Target)
-                        game.gameSpeed *= 1.1f;
+                        game.gameSpeed *= 1.05f;
                 }
 
             }

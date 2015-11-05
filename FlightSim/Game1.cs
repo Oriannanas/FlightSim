@@ -18,7 +18,6 @@ namespace FlightSim
 
     public class Game1 : Game
     {
-        Texture2D noiseTest;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         DrawHelper drawHelper;
@@ -34,15 +33,12 @@ namespace FlightSim
 
         Plane xwing;
         City city;
-        TerrainGrid terrainGrid;
-        Terrain terrain;
         SkyBox skyBox;
         public List<Target> targetList { get; set; } = new List<Target>();
 
         Model xwingModel;
         Texture2D xwingTexture;
-
-        //Texture2D[] skyboxTextures;
+        
         Texture2D skyboxTexture;
         Model skyboxModel;
 
@@ -83,7 +79,7 @@ namespace FlightSim
             Window.Title = "Flight Simulator";
 
             lightDirection.Normalize();
-            noiseTest = CreateDiamondSquareNoiseTexture();
+            //noiseTest = CreateDiamondSquareNoiseTexture();
             //noiseTest = CreatePerlinNoiseTexture(1024,1024, 1f/128f,0.5f,0.5f,10, false);
             base.Initialize();
         }
@@ -112,13 +108,6 @@ namespace FlightSim
             targetModel = LoadModel("target");
 
             city = new City(this, sceneryTexture);
-            terrainGrid = new TerrainGrid(this, 5, 512);
-            terrainGrid.LoadTerrain(-1, -1);
-            terrainGrid.LoadTerrain(0, -1);
-            terrainGrid.LoadTerrain(1, -1);
-            terrainGrid.LoadTerrain(-1, 0);
-            terrainGrid.LoadTerrain(0, 0);
-            terrainGrid.LoadTerrain(1, 0);
             xwing = new Plane(this, xwingModel, xwingTexture, bulletTexture);
             skyBox = new SkyBox(this, skyboxModel, skyboxTexture);
             
@@ -190,11 +179,11 @@ namespace FlightSim
 
 
 
-            /*if (CheckCollision(xwingSpere) != CollisionType.None)
+            if (CheckCollision(xwingSpere) != CollisionType.None)
             {
                 xwing.ResetPosition();
                 gameSpeed /= 1.1f;
-            }*/
+            }
             // TODO: Add your update logic here
 
             UpdateCamera();
@@ -255,62 +244,15 @@ namespace FlightSim
             GraphicsDevice.Clear(ClearOptions.Target | ClearOptions.DepthBuffer, Color.DarkSlateBlue, 1.0f, 0);
             
             skyBox.Draw(drawHelper);
-            //city.Draw(drawHelper);
+            city.Draw(drawHelper);
             xwing.Draw(drawHelper);
             foreach( Target target in targetList)
             {
                 target.Draw(drawHelper);
             }
-            terrainGrid.Draw(drawHelper);
-            /*spriteBatch.Begin();
-            spriteBatch.Draw(noiseTest, new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height), Color.White);
-            spriteBatch.End();*/
             base.Draw(gameTime);
         }
         
-        Texture2D CreateDiamondSquareNoiseTexture()
-        {
-            DiamondSquare dsn = new DiamondSquare(new Random(), 7, 1f, true, new float[4] { 0,0,0,0});
-            float[] test = dsn.valueList;
-            //Console.WriteLine(watch.ElapsedMilliseconds);
-            Texture2D noiseTest = new Texture2D(GraphicsDevice, (int)Math.Sqrt(test.Length), (int)Math.Sqrt(test.Length));
-            Color[] noiseColors = new Color[test.Length];
-            for(int i = 0; i < noiseColors.Length; i++)
-            {
-                noiseColors[i] = new Color(test[i], test[i], test[i]);
-            }
-            noiseTest.SetData(noiseColors);
-            return noiseTest;
-        }
-         Texture2D CreatePerlinNoiseTexture(int sizex, int sizey, float frequencia, float amplitude, float persistence, int octave, bool mipmap = false)
-        {
-            PerlinNoise pn = new PerlinNoise(sizex, sizey);
-            Texture2D t = new Texture2D(GraphicsDevice, sizex, sizey); 
-            Color[] cor = new Color[sizex * sizey];
-            float highest = 0.5f;
-            float lowest = 0.5f;
-            for (int i = 0; i < sizex; i++)
-            {
-                for (int j = 0; j < sizey; j++)
-                {
-                    float value = pn.GetRandomHeight(i, j, 1, frequencia, amplitude, persistence, octave);
-                    value = 0.5f * (1 + value);
-                    if(value > highest)
-                    {
-                        highest = value;
-                    }
-                    if(value < lowest)
-                    {
-                        lowest = value;
-                    }
-                    cor[i + j * sizex] = new Color(value, value, value);
-                }
-            }
-            Console.WriteLine(highest + " " + lowest);
-
-            t.SetData(cor);
-            return t;
-        }
 
     }
 }
